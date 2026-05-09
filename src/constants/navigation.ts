@@ -1,27 +1,34 @@
 import {
   Binary,
+  BookOpen,
   Boxes,
   Cable,
   Compass,
+  FlaskConical,
   Gauge,
   GitBranch,
   Globe2,
   Home,
+  Layers3,
   Network,
   Route,
   ShieldCheck
 } from "lucide-react";
 
 export const marketingNavItems = [
-  { label: "Platform", href: "#platform" },
-  { label: "Visualizers", href: "#visualizers" },
+  { label: "Learn", href: "/learn" },
+  { label: "Labs", href: "#visualizers" },
   { label: "Tools", href: "/tools" },
   { label: "Roadmap", href: "#roadmap" }
 ] as const;
 
 export const platformNavItems = [
   { label: "Overview", href: "/", icon: Home, description: "Learning hub" },
+  { label: "Learn", href: "/learn", icon: BookOpen, description: "Full curriculum map" },
+  { label: "Labs", href: "/learn#labs", icon: FlaskConical, description: "Interactive modules" },
   { label: "Tools", href: "/tools", icon: Compass, description: "All utilities" },
+  { label: "Protocols", href: "/learn#protocols", icon: Globe2, description: "Protocol explorer" },
+  { label: "OSI Map", href: "/learn#osi-map", icon: Layers3, description: "Layer path" },
   {
     label: "Subnet Visualizer",
     href: "/tools/subnet",
@@ -63,23 +70,26 @@ export const platformNavItems = [
 export const platformNavGroups = [
   {
     label: "Start",
-    items: [platformNavItems[0]]
+    items: [platformNavItems[0], platformNavItems[1]]
   },
   {
-    label: "Addressing",
-    items: [platformNavItems[2], platformNavItems[3]]
+    label: "Explore",
+    items: [platformNavItems[2], platformNavItems[4], platformNavItems[5]]
   },
   {
-    label: "Protocols",
-    items: [platformNavItems[4], platformNavItems[5], platformNavItems[6]]
+    label: "Current Labs",
+    items: [
+      platformNavItems[6],
+      platformNavItems[7],
+      platformNavItems[8],
+      platformNavItems[9],
+      platformNavItems[10],
+      platformNavItems[11]
+    ]
   },
   {
-    label: "Routing",
-    items: [platformNavItems[7]]
-  },
-  {
-    label: "Reference Tools",
-    items: [platformNavItems[1]]
+    label: "Reference",
+    items: [platformNavItems[3]]
   }
 ] as const;
 

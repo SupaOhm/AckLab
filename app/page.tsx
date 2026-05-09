@@ -1,16 +1,28 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Map } from "lucide-react";
 import Link from "next/link";
 
+import { GoalPathSelector } from "@/components/curriculum/goal-path-selector";
+import { ModuleCard } from "@/components/curriculum/module-card";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { NetworkPathDiagram } from "@/components/visualizations/network-path-diagram";
-import { learningPaths, visualizerCards, roadmapItems } from "@/data/platform";
+import {
+  beginnerPath,
+  getLockedModules,
+  getModules,
+  getUnlockedModules,
+  goalPaths
+} from "@/data/curriculum";
+import { roadmapItems } from "@/data/platform";
 
 export default function HomePage() {
+  const beginnerModules = getModules(beginnerPath.moduleIds).slice(0, 6);
+  const unlockedLabs = getUnlockedModules();
+  const lockedPreview = getLockedModules().slice(0, 8);
+
   return (
     <div className="min-h-screen">
       <SiteHeader />
@@ -31,13 +43,16 @@ export default function HomePage() {
               </p>
               <div className="mt-10 flex flex-col gap-3 sm:flex-row">
                 <Button asChild size="lg">
-                  <Link href="/tools/subnet">
-                    Start with Subnetting
+                  <Link href="/tools/binary">
+                    Start with Binary
                     <ArrowRight className="size-4" />
                   </Link>
                 </Button>
                 <Button asChild size="lg" variant="outline">
-                  <Link href="/visualizers/tcp-handshake">Open TCP Lab</Link>
+                  <Link href="/learn">
+                    Open Learning Map
+                    <Map className="size-4" />
+                  </Link>
                 </Button>
               </div>
               <p className="mt-8 text-sm leading-6 text-muted-foreground/70">
@@ -51,72 +66,60 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Learning paths */}
+        {/* Network fundamentals map */}
         <section id="platform" className="mx-auto max-w-6xl px-6 py-28 sm:px-8 lg:px-10">
           <SectionHeading
-            eyebrow="Learning paths"
-            title="Choose the concept you want to understand first."
-            description="Each path starts with a working visual tool and a short explanation, so the concept is anchored to something you can change."
+            eyebrow="Network Fundamentals Map"
+            title="Start your networking journey in order."
+            description="The map shows what is available now, what comes next, and how each concept connects."
+            action={
+              <Button asChild variant="outline">
+                <Link href="/learn">View full map</Link>
+              </Button>
+            }
           />
-          <div className="mt-14 grid gap-6 md:grid-cols-2">
-            {learningPaths.map((path) => (
-              <Card key={path.title} className="group transition-colors hover:border-primary/20">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <Badge variant="secondary">{path.difficulty}</Badge>
-                  </div>
-                  <CardTitle className="text-lg">{path.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm leading-7 text-muted-foreground">{path.description}</p>
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    {path.tools.map((tool) => (
-                      <Badge key={tool} variant="outline">
-                        {tool}
-                      </Badge>
-                    ))}
-                  </div>
-                  <Button asChild variant="ghost" className="mt-6 px-0 text-primary">
-                    <Link href={path.href}>
-                      Start path
-                      <ArrowRight className="size-4" />
-                    </Link>
-                  </Button>
-                </CardContent>
-              </Card>
+          <div className="mt-14 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {beginnerModules.map((module) => (
+              <ModuleCard key={module.id} module={module} compact />
             ))}
           </div>
         </section>
 
-        {/* Visualizers */}
+        {/* Available labs */}
         <section id="visualizers" className="border-y border-border/15 bg-card/10">
           <div className="mx-auto max-w-6xl px-6 py-28 sm:px-8 lg:px-10">
             <SectionHeading
-              eyebrow="Visualizers"
-              title="Interact with the hidden systems behind everyday networking."
-              description="Labs are designed around user actions: create an event, watch packets move, inspect headers, then connect the behavior to plain-English protocol meaning."
+              eyebrow="Unlocked now"
+              title="Open the labs available in this MVP."
+              description="These modules link to working interactive tools. Locked modules remain visible in the full map."
               action={
                 <Button asChild variant="outline">
                   <Link href="/tools">Browse tools</Link>
                 </Button>
               }
             />
-            <div className="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-              {visualizerCards.map((card) => (
-                <Link key={card.title} href={card.href}>
-                  <Card className="group h-full transition-colors hover:border-primary/20">
-                    <CardHeader>
-                      <div className="flex items-center justify-between gap-3">
-                        <Badge variant="success">{card.status}</Badge>
-                        <span className="font-mono text-xs text-primary/60">{card.signal}</span>
-                      </div>
-                      <CardTitle>{card.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm leading-7 text-muted-foreground">{card.description}</p>
-                    </CardContent>
-                  </Card>
-                </Link>
+            <div className="mt-14 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {unlockedLabs.map((module) => (
+                <ModuleCard key={module.id} module={module} />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-6xl px-6 py-28 sm:px-8 lg:px-10">
+          <GoalPathSelector paths={goalPaths} />
+        </section>
+
+        <section className="border-y border-border/15 bg-card/10">
+          <div className="mx-auto max-w-6xl px-6 py-28 sm:px-8 lg:px-10">
+            <SectionHeading
+              eyebrow="Coming later"
+              title="Locked modules preview the full curriculum."
+              description="AckLab keeps future concepts visible without pretending they are implemented."
+            />
+            <div className="mt-14 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              {lockedPreview.map((module) => (
+                <ModuleCard key={module.id} module={module} compact />
               ))}
             </div>
           </div>
