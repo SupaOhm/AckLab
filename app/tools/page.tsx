@@ -11,11 +11,11 @@ export default function ToolsPage() {
   return (
     <PlatformShell>
       <PageHeader
-        eyebrow="Tool dashboard"
-        title="Networking utilities for fast concept checks."
-        description="Use live MVP tools today and preview the diagnostic utilities planned for future platform expansion."
+        eyebrow="Reference tools"
+        title="Choose a networking concept to practice."
+        description="Live tools are organized by the concept they teach. Coming-soon tools preview future reference and diagnostics workflows."
       />
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
         {toolCards.map((tool) => (
           <ToolCard key={tool.title} tool={tool} />
         ))}

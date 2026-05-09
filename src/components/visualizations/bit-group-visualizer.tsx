@@ -10,7 +10,11 @@ interface BitGroupVisualizerProps {
   compact?: boolean;
 }
 
-export function BitGroupVisualizer({ octets, cidr = 32, compact = false }: BitGroupVisualizerProps) {
+export function BitGroupVisualizer({
+  octets,
+  cidr = 32,
+  compact = false
+}: BitGroupVisualizerProps) {
   let bitIndex = 0;
 
   return (

@@ -11,7 +11,7 @@
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "docker:build": "docker build -t acklab:local .",
     "docker:run": "docker run --rm -p 3000:3000 acklab:local",
     "docker:compose": "docker compose up --build",

@@ -23,22 +23,20 @@ The current product is intentionally local-mock only. It does not implement a ba
 
 ```text
 app/                  App Router pages and global layout
-components/ui/        shadcn-compatible primitives
-components/layout/    shell, nav, command menu, theme provider
-components/shared/    reusable product UI
-components/visualizations/
-features/networking/  calculators, visualizers, networking domain logic
-features/admin/       future admin placeholder
-features/courses/     future course/progress placeholder
-services/             future auth/API/payment/progress contracts only
-data/                 local mock data
-types/                shared TypeScript contracts
-config/               app and environment configuration
-constants/            navigation and constants
+src/components/ui/    shadcn-compatible primitives
+src/components/layout/ shell, nav, command menu, theme provider
+src/components/shared/ reusable product UI
+src/components/visualizations/
+src/features/         domain-owned interactive tools and visualizers
+src/services/         future auth/API/payment/progress contracts only
+src/data/             local mock data
+src/types/            shared TypeScript contracts
+src/config/           app and environment configuration
+src/constants/        navigation and constants
 docs/                 architecture and deployment documentation
 ```
 
-Future infrastructure concerns are represented by interface contracts in `services/`, but no network calls or server-side integrations are active.
+Future infrastructure concerns are represented by interface contracts in `src/services/`, but no network calls or server-side integrations are active.
 
 ## Local Setup
 
@@ -72,7 +70,7 @@ pnpm clean            # remove generated build artifacts
 
 ## Environment Variables
 
-Environment validation lives in `config/env.ts`.
+Environment validation lives in `src/config/env.ts`.
 
 Copy `.env.example` to `.env.local` for local development:
 

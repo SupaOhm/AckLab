@@ -5,25 +5,31 @@ AckLab is organized as a feature-oriented Next.js App Router project. The curren
 ## Current Runtime
 
 - `app/` contains route segments and page composition.
-- `features/networking/` owns domain logic and interactive visualization components.
-- `components/ui/` contains shadcn-compatible primitives.
-- `components/layout/` contains navigation, app shell, command menu, and theme providers.
-- `data/` contains local mock data.
-- `services/` contains future service contracts only.
+- `src/features/subnet/` owns subnet visualization and subnet calculation logic.
+- `src/features/binary/` owns binary conversion UI and conversion logic.
+- `src/features/tcp-handshake/` owns TCP handshake visualization.
+- `src/features/osi/` owns OSI layer visualization.
+- `src/features/dns/` owns DNS flow visualization.
+- `src/features/routing/` owns routing visualization and path calculation logic.
+- `src/components/ui/` contains shadcn-compatible primitives.
+- `src/components/layout/` contains navigation, app shell, command menu, and theme providers.
+- `src/components/shared/` contains reusable product-level components.
+- `src/components/visualizations/` contains shared visual building blocks.
+- `src/data/` contains local mock data.
+- `src/lib/` contains shared utilities and networking primitives.
+- `src/services/` contains future service contracts only.
 
 ## Future Expansion Boundaries
 
-- Auth: `services/auth`
-- RBAC: `services/rbac`
-- API client: `services/api`
-- Database: `services/database`
-- Payments and subscriptions: `services/payments`
-- Progress tracking: `services/progress`
-- Quiz engine: `services/quiz`
-- Analytics: `services/analytics`
-- Rate limiting and secure sessions: `services/security`
-- Audit logging: `services/audit`
-- Admin surfaces: `features/admin`
-- Course content: `features/courses`
+- Auth: `src/services/auth`
+- RBAC: `src/services/rbac`
+- API client: `src/services/api`
+- Database: `src/services/database`
+- Payments and subscriptions: `src/services/payments`
+- Progress tracking: `src/services/progress`
+- Quiz engine: `src/services/quiz`
+- Analytics: `src/services/analytics`
+- Rate limiting and secure sessions: `src/services/security`
+- Audit logging: `src/services/audit`
 
 These placeholders are intentionally minimal. Add real adapters behind these contracts only when the product introduces server-side infrastructure.

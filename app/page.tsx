@@ -58,7 +58,10 @@ export default function HomePage() {
           />
           <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
             {learningPaths.map((path) => (
-              <Card key={path.title} className="group h-full transition-colors hover:border-primary/35">
+              <Card
+                key={path.title}
+                className="group h-full transition-colors hover:border-primary/35"
+              >
                 <CardHeader>
                   <div className="mb-2 flex items-center justify-between gap-3">
                     <Badge variant="secondary">{path.difficulty}</Badge>

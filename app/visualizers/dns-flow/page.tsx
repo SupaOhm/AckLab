@@ -1,6 +1,6 @@
 import { PlatformShell } from "@/components/layout/platform-shell";
 import { PageHeader } from "@/components/shared/page-header";
-import { DnsFlowVisualizer } from "@/features/networking/components/dns-flow-visualizer";
+import { DnsFlowVisualizer } from "@/features/dns/components/dns-flow-visualizer";
 
 export const metadata = {
   title: "DNS Flow Visualizer"
@@ -11,8 +11,8 @@ export default function DnsFlowPage() {
     <PlatformShell>
       <PageHeader
         eyebrow="Name resolution"
-        title="DNS flow visualizer"
-        description="Follow a recursive DNS lookup from browser cache through resolver, root, TLD, and authoritative nameserver."
+        title="DNS Flow Visualizer"
+        description="Follow the step-by-step lookup that turns a domain name into an IP address."
       />
       <DnsFlowVisualizer />
     </PlatformShell>

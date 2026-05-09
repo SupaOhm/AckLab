@@ -14,7 +14,7 @@ export function ToolCard({ tool }: { tool: ToolCardType }) {
       aria-disabled={!live}
       className={!live ? "pointer-events-none" : undefined}
     >
-      <Card className="group h-full overflow-hidden transition-all hover:-translate-y-0.5 hover:border-primary/45 hover:shadow-xl hover:shadow-primary/10">
+      <Card className="group h-full overflow-hidden transition-colors hover:border-primary/35">
         <CardHeader>
           <div className="flex items-center justify-between gap-3">
             <Badge variant={live ? "success" : "outline"}>{tool.status}</Badge>
@@ -27,7 +27,7 @@ export function ToolCard({ tool }: { tool: ToolCardType }) {
           <CardTitle>{tool.title}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm leading-6 text-muted-foreground">{tool.description}</p>
+          <p className="text-sm leading-7 text-muted-foreground">{tool.description}</p>
           <p className="mt-4 text-xs font-medium uppercase tracking-[0.18em] text-primary">
             {tool.category}
           </p>
