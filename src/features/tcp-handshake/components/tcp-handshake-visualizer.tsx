@@ -1,7 +1,15 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Cable, RotateCcw, Send, Unplug } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
+import {
+  CheckCircle2,
+  MonitorSmartphone,
+  RotateCcw,
+  Send,
+  Server,
+  Unplug,
+  Wifi
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { ExplanationPanel } from "@/components/shared/explanation-panel";
@@ -10,10 +18,8 @@ import { ToolWorkspace } from "@/components/shared/tool-workspace";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { EventTimeline } from "@/components/visualizations/event-timeline";
-import { PacketInspector } from "@/components/visualizations/packet-inspector";
-import { ProtocolStatePanel } from "@/components/visualizations/protocol-state-panel";
-import type { NetworkEvent, ProtocolState } from "@/lib/simulation/types";
+import type { NetworkEvent } from "@/lib/simulation/types";
+import { cn } from "@/lib/utils";
 
 import {
   createPacketEvent,
@@ -27,13 +33,22 @@ const initialClientSequence = 1200;
 const initialServerSequence = 8400;
 const clientPort = 53142;
 const serverPort = 443;
+const packetDelay = 780;
+const reducedMotionDelay = 90;
 
 interface SequenceState {
   client: number;
   server: number;
 }
 
+interface PacketSequenceOptions {
+  onPacketStart?: (packet: TcpPacket, index: number) => void;
+  onPacketComplete?: (packet: TcpPacket, index: number) => void;
+  onComplete?: () => void;
+}
+
 export function TcpHandshakeVisualizer() {
+  const reduceMotion = useReducedMotion();
   const [clientState, setClientState] = useState<TcpConnectionState>("CLOSED");
   const [serverState, setServerState] = useState<TcpConnectionState>("LISTEN");
   const [packets, setPackets] = useState<TcpPacket[]>([]);
@@ -41,6 +56,8 @@ export function TcpHandshakeVisualizer() {
   const [selectedPacketId, setSelectedPacketId] = useState<string>();
   const [activePacketId, setActivePacketId] = useState<string>();
   const [message, setMessage] = useState("hello acklab");
+  const [receivedMessage, setReceivedMessage] = useState("");
+  const [isAnimating, setIsAnimating] = useState(false);
   const [sequence, setSequence] = useState<SequenceState>({
     client: initialClientSequence,
     server: initialServerSequence
@@ -55,58 +72,73 @@ export function TcpHandshakeVisualizer() {
 
   const selectedPacket =
     packets.find((packet) => packet.id === selectedPacketId) ?? packets.at(-1) ?? null;
+  const currentActivePacket = packets.find((packet) => packet.id === activePacketId);
+  const displayedPacket =
+    (isAnimating ? currentActivePacket : (selectedPacket ?? currentActivePacket)) ?? null;
+  const activePacket = currentActivePacket ?? selectedPacket ?? undefined;
   const connected = clientState === "ESTABLISHED" && serverState === "ESTABLISHED";
-
-  const protocolStates: ProtocolState[] = [
-    {
-      label: "Client TCP state",
-      value: clientState,
-      description: connected
-        ? "The client can send application data over this simulated socket."
-        : "The client is waiting for a connection action."
-    },
-    {
-      label: "Server TCP state",
-      value: serverState,
-      description: connected
-        ? "The server accepted the handshake and is ready to acknowledge data."
-        : "The server is listening for a new SYN."
-    },
-    {
-      label: "Socket pair",
-      value: `${clientPort} -> ${serverPort}`,
-      description:
-        "A TCP connection is identified by source port, destination port, and host addresses."
-    }
-  ];
+  const canConnect = clientState === "CLOSED" && serverState === "LISTEN" && !isAnimating;
+  const canSend = connected && message.trim().length > 0 && !isAnimating;
+  const canClose = connected && !isAnimating;
 
   function clearPacketTimers(timerIds: number[]) {
     timerIds.forEach((timer) => window.clearTimeout(timer));
     timerIds.length = 0;
   }
 
-  function commitPackets(packetBatch: TcpPacket[]) {
-    setPackets((current) => [...current, ...packetBatch]);
-    setEvents((current) => [
-      ...current,
-      ...packetBatch.map((packet, index) => createPacketEvent(packet, current.length + index + 1))
-    ]);
-    setSelectedPacketId(packetBatch.at(-1)?.id);
+  function revealPacket(packet: TcpPacket) {
+    setPackets((current) => [...current, packet]);
+    setEvents((current) => [...current, createPacketEvent(packet, current.length + 1)]);
+    setActivePacketId(packet.id);
+    setSelectedPacketId(packet.id);
+  }
+
+  function runPacketSequence(packetBatch: TcpPacket[], options: PacketSequenceOptions = {}) {
+    setIsAnimating(true);
 
     clearPacketTimers(timers.current);
+
+    const delay = reduceMotion ? reducedMotionDelay : packetDelay;
+    const travelDelay = reduceMotion ? 0 : packetDelay;
+
     packetBatch.forEach((packet, index) => {
-      const timer = window.setTimeout(() => setActivePacketId(packet.id), index * 800);
+      const timer = window.setTimeout(() => {
+        options.onPacketStart?.(packet, index);
+        revealPacket(packet);
+      }, index * delay);
       timers.current.push(timer);
+
+      const completeTimer = window.setTimeout(
+        () => {
+          options.onPacketComplete?.(packet, index);
+        },
+        index * delay + travelDelay
+      );
+      timers.current.push(completeTimer);
     });
+
+    const doneTimer = window.setTimeout(
+      () => {
+        options.onComplete?.();
+        setIsAnimating(false);
+      },
+      Math.max(packetBatch.length - 1, 0) * delay + travelDelay
+    );
+    timers.current.push(doneTimer);
+  }
+
+  function nextPacketId(offset = 1) {
+    return `tcp-${packets.length + offset}`;
   }
 
   function handleConnect() {
-    if (connected || clientState === "SYN-SENT") {
+    if (!canConnect) {
       return;
     }
 
+    setClientState("SYN-SENT");
     const syn = createTcpPacket({
-      id: `tcp-${packets.length + 1}`,
+      id: nextPacketId(1),
       label: "SYN",
       from: tcpNodes[0].label,
       to: tcpNodes[1].label,
@@ -116,11 +148,10 @@ export function TcpHandshakeVisualizer() {
       acknowledgementNumber: 0,
       sourcePort: clientPort,
       destinationPort: serverPort,
-      explanation:
-        "The client asks the server to synchronize sequence numbers and open a TCP session."
+      explanation: "The client asks to open a TCP connection."
     });
     const synAck = createTcpPacket({
-      id: `tcp-${packets.length + 2}`,
+      id: nextPacketId(2),
       label: "SYN-ACK",
       from: tcpNodes[1].label,
       to: tcpNodes[0].label,
@@ -130,11 +161,10 @@ export function TcpHandshakeVisualizer() {
       acknowledgementNumber: sequence.client + 1,
       sourcePort: serverPort,
       destinationPort: clientPort,
-      explanation:
-        "The server acknowledges the client's SYN and sends its own sequence number back."
+      explanation: "The server accepts and sends its own sequence number."
     });
     const ack = createTcpPacket({
-      id: `tcp-${packets.length + 3}`,
+      id: nextPacketId(3),
       label: "ACK",
       from: tcpNodes[0].label,
       to: tcpNodes[1].label,
@@ -144,25 +174,37 @@ export function TcpHandshakeVisualizer() {
       acknowledgementNumber: sequence.server + 1,
       sourcePort: clientPort,
       destinationPort: serverPort,
-      explanation: "The client confirms the server sequence number. The socket is now established."
+      explanation: "The client confirms the server sequence. The socket is open."
     });
 
-    setClientState("ESTABLISHED");
-    setServerState("ESTABLISHED");
-    setSequence({ client: sequence.client + 1, server: sequence.server + 1 });
-    commitPackets([syn, synAck, ack]);
+    runPacketSequence([syn, synAck, ack], {
+      onPacketStart: (_packet, index) => {
+        if (index === 1) {
+          setServerState("SYN-RECEIVED");
+        }
+
+        if (index === 2) {
+          setClientState("ESTABLISHED");
+        }
+      },
+      onComplete: () => {
+        setClientState("ESTABLISHED");
+        setServerState("ESTABLISHED");
+        setSequence({ client: sequence.client + 1, server: sequence.server + 1 });
+      }
+    });
   }
 
   function handleSendMessage() {
-    if (!connected || message.trim().length === 0) {
+    if (!canSend) {
       return;
     }
 
     const payload = message.trim();
     const payloadLength = payload.length;
     const dataPacket = createTcpPacket({
-      id: `tcp-${packets.length + 1}`,
-      label: "PSH-ACK",
+      id: nextPacketId(1),
+      label: "DATA",
       from: tcpNodes[0].label,
       to: tcpNodes[1].label,
       direction: "outbound",
@@ -172,11 +214,10 @@ export function TcpHandshakeVisualizer() {
       sourcePort: clientPort,
       destinationPort: serverPort,
       payload,
-      explanation:
-        "The client pushes application bytes to the server while acknowledging the last server byte."
+      explanation: "The client sends application bytes to the server."
     });
     const acknowledgement = createTcpPacket({
-      id: `tcp-${packets.length + 2}`,
+      id: nextPacketId(2),
       label: "ACK",
       from: tcpNodes[1].label,
       to: tcpNodes[0].label,
@@ -186,21 +227,30 @@ export function TcpHandshakeVisualizer() {
       acknowledgementNumber: sequence.client + payloadLength,
       sourcePort: serverPort,
       destinationPort: clientPort,
-      explanation: "The server acknowledges the bytes it received from the client payload."
+      explanation: "The server confirms it received the payload bytes."
     });
 
-    setSequence({ client: sequence.client + payloadLength, server: sequence.server });
-    commitPackets([dataPacket, acknowledgement]);
+    runPacketSequence([dataPacket, acknowledgement], {
+      onPacketComplete: (_packet, index) => {
+        if (index === 0) {
+          setReceivedMessage(payload);
+        }
+      },
+      onComplete: () => {
+        setSequence({ client: sequence.client + payloadLength, server: sequence.server });
+      }
+    });
   }
 
   function handleCloseConnection() {
-    if (!connected) {
+    if (!canClose) {
       return;
     }
 
+    setClientState("FIN-WAIT");
     const fin = createTcpPacket({
-      id: `tcp-${packets.length + 1}`,
-      label: "FIN-ACK",
+      id: nextPacketId(1),
+      label: "FIN",
       from: tcpNodes[0].label,
       to: tcpNodes[1].label,
       direction: "outbound",
@@ -209,10 +259,10 @@ export function TcpHandshakeVisualizer() {
       acknowledgementNumber: sequence.server,
       sourcePort: clientPort,
       destinationPort: serverPort,
-      explanation: "The client says it has finished sending data and wants to close the connection."
+      explanation: "The client asks to close its side of the connection."
     });
     const ack = createTcpPacket({
-      id: `tcp-${packets.length + 2}`,
+      id: nextPacketId(2),
       label: "ACK",
       from: tcpNodes[1].label,
       to: tcpNodes[0].label,
@@ -222,14 +272,47 @@ export function TcpHandshakeVisualizer() {
       acknowledgementNumber: sequence.client + 1,
       sourcePort: serverPort,
       destinationPort: clientPort,
-      explanation:
-        "The server acknowledges the close request before ending its side of the session."
+      explanation: "The server acknowledges the close request."
+    });
+    const serverFin = createTcpPacket({
+      id: nextPacketId(3),
+      label: "FIN",
+      from: tcpNodes[1].label,
+      to: tcpNodes[0].label,
+      direction: "inbound",
+      flags: ["FIN", "ACK"],
+      sequenceNumber: sequence.server,
+      acknowledgementNumber: sequence.client + 1,
+      sourcePort: serverPort,
+      destinationPort: clientPort,
+      explanation: "The server closes its side of the connection."
+    });
+    const finalAck = createTcpPacket({
+      id: nextPacketId(4),
+      label: "ACK",
+      from: tcpNodes[0].label,
+      to: tcpNodes[1].label,
+      direction: "outbound",
+      flags: ["ACK"],
+      sequenceNumber: sequence.client + 1,
+      acknowledgementNumber: sequence.server + 1,
+      sourcePort: clientPort,
+      destinationPort: serverPort,
+      explanation: "The client confirms the server FIN. The socket returns to idle."
     });
 
-    setClientState("CLOSED");
-    setServerState("LISTEN");
-    setSequence({ client: sequence.client + 1, server: sequence.server });
-    commitPackets([fin, ack]);
+    runPacketSequence([fin, ack, serverFin, finalAck], {
+      onPacketStart: (_packet, index) => {
+        if (index === 1) {
+          setServerState("CLOSE-WAIT");
+        }
+      },
+      onComplete: () => {
+        setClientState("CLOSED");
+        setServerState("LISTEN");
+        setSequence({ client: sequence.client + 1, server: sequence.server + 1 });
+      }
+    });
   }
 
   function handleReset() {
@@ -240,192 +323,324 @@ export function TcpHandshakeVisualizer() {
     setEvents([]);
     setSelectedPacketId(undefined);
     setActivePacketId(undefined);
+    setReceivedMessage("");
+    setIsAnimating(false);
     setSequence({ client: initialClientSequence, server: initialServerSequence });
   }
 
   return (
-    <div className="grid gap-10">
+    <div className="grid gap-8">
       <ToolWorkspace
         title="TCP socket lab"
-        description="Cause the connection yourself. Each action creates real TCP-like packets, state changes, and inspectable headers."
+        description="Control the client. Watch connection state, packets, and acknowledgements change."
       >
-        <div className="grid gap-8 xl:grid-cols-[300px_minmax(0,1fr)_320px]">
-          <section className="space-y-5">
-            <div>
-              <p className="text-sm font-semibold">Control the client</p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Open a connection, send bytes, and watch the server acknowledge what happened.
-              </p>
+        <div className="grid min-w-0 gap-5">
+          <section className="flex min-w-0 flex-col gap-3 rounded-2xl border border-border/15 bg-background/35 p-3 lg:flex-row lg:items-end">
+            <div className="grid min-w-0 flex-1 gap-2">
+              <Label htmlFor="tcp-message">Message</Label>
+              <Input
+                id="tcp-message"
+                value={message}
+                onChange={(event) => setMessage(event.target.value)}
+                disabled={!connected}
+                placeholder="Type a message"
+              />
             </div>
-
-            <div className="grid gap-3">
-              <Button onClick={handleConnect} disabled={connected}>
-                <Cable className="size-4" />
+            <div className="flex min-w-0 flex-wrap gap-2">
+              <Button
+                className="min-w-24 flex-1 sm:flex-none"
+                size="sm"
+                onClick={handleConnect}
+                disabled={!canConnect}
+              >
+                <Wifi className="size-4" />
                 Connect
               </Button>
-              <div className="grid gap-2">
-                <Label htmlFor="tcp-message">Message payload</Label>
-                <Input
-                  id="tcp-message"
-                  value={message}
-                  onChange={(event) => setMessage(event.target.value)}
-                  disabled={!connected}
-                  placeholder="Type bytes to send"
-                />
-                <p className="text-xs leading-5 text-muted-foreground">
-                  Payload length changes the next sequence number.
-                </p>
-              </div>
               <Button
+                className="min-w-32 flex-1 sm:flex-none"
+                size="sm"
                 onClick={handleSendMessage}
-                disabled={!connected || message.trim().length === 0}
+                disabled={!canSend}
               >
                 <Send className="size-4" />
                 Send message
               </Button>
-              <Button variant="outline" onClick={handleCloseConnection} disabled={!connected}>
+              <Button
+                className="min-w-20 flex-1 sm:flex-none"
+                size="sm"
+                variant="outline"
+                onClick={handleCloseConnection}
+                disabled={!canClose}
+              >
                 <Unplug className="size-4" />
-                Close connection
+                Close
               </Button>
-              <Button variant="ghost" onClick={handleReset}>
+              <Button
+                className="min-w-20 flex-1 sm:flex-none"
+                size="sm"
+                variant="ghost"
+                onClick={handleReset}
+              >
                 <RotateCcw className="size-4" />
-                Retry lab
+                Reset
               </Button>
             </div>
           </section>
 
-          <section className="relative min-h-[420px] overflow-hidden rounded-xl bg-secondary/8 p-6">
-            <div className="network-grid absolute inset-0 opacity-8" />
-            <div className="relative z-10 flex h-full min-h-[360px] flex-col justify-between">
-              <div className="flex items-center justify-between gap-4">
-                <StatusPill connected={connected} />
-                <span className="text-xs text-muted-foreground">Simulated TCP over IPv4</span>
+          <section className="relative min-w-0 overflow-hidden rounded-3xl border border-border/15 bg-card/25 p-3 shadow-xl shadow-black/10 sm:p-6">
+            <div className="network-grid absolute inset-0 opacity-10" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_35%,hsl(var(--primary)/0.08),transparent_32%),radial-gradient(circle_at_82%_45%,hsl(var(--primary)/0.08),transparent_30%)]" />
+            <div className="relative z-10 grid min-h-[500px] min-w-0 grid-rows-[auto_1fr_auto] gap-4 sm:gap-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <StatusPill connected={connected} animating={isAnimating} />
+                <div className="flex flex-wrap gap-x-3 gap-y-1 font-mono text-xs text-muted-foreground">
+                  <span>client seq {sequence.client}</span>
+                  <span>server seq {sequence.server}</span>
+                </div>
               </div>
 
-              <div className="relative flex items-center justify-between px-1 sm:px-6">
-                <LabNode label="Client" address={tcpNodes[0].address} state={clientState} />
+              <div className="relative min-w-0 overflow-hidden rounded-2xl border border-border/10 bg-background/35 p-3 sm:p-5">
                 <div className="absolute left-[17%] right-[17%] top-1/2 h-px bg-border/45" />
-                <div className="absolute left-[17%] right-[17%] top-[calc(50%-18px)] h-9 rounded-full bg-primary/5" />
-                <LabNode
-                  label="Server"
-                  address={tcpNodes[1].address}
-                  state={serverState}
-                  align="right"
-                />
-                {selectedPacket ? (
-                  <AnimatedPacket
-                    key={activePacketId}
-                    packet={
-                      packets.find((packet) => packet.id === activePacketId) ?? selectedPacket
-                    }
+                <div className="absolute left-[17%] right-[17%] top-[calc(50%-20px)] h-10 rounded-full bg-primary/5" />
+                <div className="relative flex min-h-[320px] min-w-0 items-center justify-between gap-4">
+                  <HostNode
+                    label="Client"
+                    address={tcpNodes[0].address}
+                    state={clientState}
+                    kind="client"
                   />
-                ) : null}
+                  <HostNode
+                    label="Server"
+                    address={tcpNodes[1].address}
+                    state={serverState}
+                    kind="server"
+                    receivedMessage={receivedMessage}
+                  />
+                  {activePacket ? (
+                    <AnimatedPacket
+                      key={activePacket.id}
+                      packet={activePacket}
+                      reduceMotion={reduceMotion}
+                    />
+                  ) : null}
+                </div>
               </div>
 
-              <div className="grid gap-3 rounded-xl border border-border/10 bg-background/30 p-4 sm:grid-cols-3">
-                <MiniMetric label="Client seq" value={sequence.client} />
-                <MiniMetric label="Server seq" value={sequence.server} />
-                <MiniMetric label="Packets" value={packets.length} />
+              <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(240px,280px)]">
+                <CompactTimeline
+                  events={events}
+                  activePacketId={displayedPacket?.id}
+                  onSelectPacket={setSelectedPacketId}
+                />
+                <TcpPacketInspector packet={displayedPacket} />
               </div>
             </div>
           </section>
-
-          <div className="space-y-5">
-            <ProtocolStatePanel title="TCP state" states={protocolStates} />
-            <PacketInspector packet={selectedPacket} />
-          </div>
         </div>
       </ToolWorkspace>
 
-      <div className="grid gap-6 lg:grid-cols-[0.9fr_1fr]">
-        <EventTimeline
-          events={events}
-          activePacketId={selectedPacket?.id}
-          onSelectPacket={setSelectedPacketId}
-        />
-        <ExplanationPanel title={selectedPacket ? selectedPacket.label : "Start the lab"}>
-          {selectedPacket ? (
-            <>
-              <p>{selectedPacket.explanation}</p>
-              <p>
-                Notice how every TCP segment carries state. Flags explain intent, sequence numbers
-                track bytes, and acknowledgements tell the other side what arrived.
-              </p>
-            </>
-          ) : (
-            <>
-              <p>
-                Click Connect to generate the SYN, SYN-ACK, and ACK packets that create a TCP
-                session.
-              </p>
-              <p>
-                After the socket is established, send a message to see payload bytes affect sequence
-                and acknowledgement numbers.
-              </p>
-            </>
-          )}
+      <div className="grid gap-5 lg:grid-cols-[1fr_0.7fr]">
+        <ExplanationPanel title={displayedPacket ? displayedPacket.label : "Start"}>
+          <p>
+            {displayedPacket
+              ? displayedPacket.explanation
+              : "Click Connect to create SYN, SYN-ACK, and ACK packets."}
+          </p>
         </ExplanationPanel>
+        <PracticePrompt prompt="Connect, send a short message, then inspect how ACK changes." />
       </div>
-
-      <PracticePrompt prompt="Connect, send two different messages, then compare how the ACK number changes after each payload." />
     </div>
   );
 }
 
-function AnimatedPacket({ packet }: { packet: TcpPacket }) {
+function AnimatedPacket({
+  packet,
+  reduceMotion
+}: {
+  packet: TcpPacket;
+  reduceMotion: boolean | null;
+}) {
   const outbound = packet.direction === "outbound";
+  const start = outbound ? "18%" : "74%";
+  const end = outbound ? "74%" : "18%";
 
   return (
-    <motion.button
-      type="button"
-      className="absolute top-[calc(50%-18px)] z-20 rounded-full border border-primary/25 bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/20"
-      initial={{ left: outbound ? "17%" : "73%", opacity: 0, scale: 0.92 }}
-      animate={{ left: outbound ? "73%" : "17%", opacity: 1, scale: 1 }}
-      transition={{ duration: 0.75, ease: "easeInOut" }}
+    <motion.div
+      className="absolute top-[calc(50%-20px)] z-30 rounded-full border border-primary/25 bg-primary px-4 py-2 font-mono text-xs font-semibold text-primary-foreground shadow-sm shadow-primary/20"
+      initial={reduceMotion ? { left: end, opacity: 1 } : { left: start, opacity: 0, scale: 0.92 }}
+      animate={{ left: end, opacity: 1, scale: 1 }}
+      transition={{ duration: reduceMotion ? 0 : 0.72, ease: "easeInOut" }}
     >
       {packet.label}
-    </motion.button>
+    </motion.div>
   );
 }
 
-function LabNode({
+function HostNode({
   label,
   address,
   state,
-  align = "left"
+  kind,
+  receivedMessage
 }: {
   label: string;
   address: string;
   state: TcpConnectionState;
-  align?: "left" | "right";
+  kind: "client" | "server";
+  receivedMessage?: string;
 }) {
+  const Icon = kind === "client" ? MonitorSmartphone : Server;
+
   return (
-    <div className={align === "right" ? "relative z-10 text-right" : "relative z-10"}>
-      <div className="grid size-28 place-items-center rounded-2xl border border-primary/18 bg-background/60 shadow-sm">
-        <div className="grid size-14 place-items-center rounded-xl bg-primary/12 text-primary">
-          <Cable className="size-7" />
+    <div className={kind === "server" ? "relative z-10 text-right" : "relative z-10"}>
+      <div className="grid size-32 place-items-center rounded-3xl border border-primary/18 bg-background/70 shadow-lg shadow-black/10 backdrop-blur">
+        <div className="grid size-16 place-items-center rounded-2xl bg-primary/12 text-primary">
+          <Icon className="size-8" />
         </div>
       </div>
-      <p className="mt-4 text-sm font-semibold">{label}</p>
-      <p className="font-mono text-xs text-muted-foreground">{address}</p>
-      <p className="mt-2 font-mono text-xs text-primary">{state}</p>
+      <div className={kind === "server" ? "mt-4 grid justify-items-end" : "mt-4"}>
+        <p className="text-sm font-semibold">{label}</p>
+        <p className="font-mono text-xs text-muted-foreground">{address}</p>
+        <StateBadge state={state} />
+        {kind === "server" ? (
+          <div className="mt-3 max-w-48 rounded-xl bg-secondary/12 px-3 py-2 text-left">
+            <p className="text-[11px] text-muted-foreground">Received</p>
+            <p className="mt-1 truncate font-mono text-xs">
+              {receivedMessage ? `"${receivedMessage}"` : "waiting..."}
+            </p>
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }
 
-function StatusPill({ connected }: { connected: boolean }) {
+function StateBadge({ state }: { state: TcpConnectionState }) {
+  const active = state === "ESTABLISHED";
+
   return (
-    <span className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-      {connected ? "Connection established" : "No active TCP session"}
+    <span
+      className={cn(
+        "mt-2 inline-flex rounded-full border px-2.5 py-1 font-mono text-[11px]",
+        active
+          ? "border-primary/25 bg-primary/10 text-primary"
+          : "border-border/30 bg-secondary/12 text-muted-foreground"
+      )}
+    >
+      {state}
     </span>
   );
 }
 
-function MiniMetric({ label, value }: { label: string; value: number }) {
+function StatusPill({ connected, animating }: { connected: boolean; animating: boolean }) {
   return (
-    <div>
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="mt-1 font-mono text-lg font-semibold">{value}</p>
-    </div>
+    <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+      {connected ? <CheckCircle2 className="size-3.5" /> : null}
+      {animating ? "Packet in flight" : connected ? "Connection established" : "Ready to connect"}
+    </span>
+  );
+}
+
+function TcpPacketInspector({ packet }: { packet: TcpPacket | null }) {
+  if (!packet) {
+    return (
+      <section className="rounded-2xl border border-border/15 bg-background/45 p-4">
+        <p className="text-sm font-semibold">Packet inspector</p>
+        <p className="mt-2 text-xs text-muted-foreground">Packets appear after Connect.</p>
+      </section>
+    );
+  }
+
+  const fields = [
+    ["flags", packet.flags.join(", ")],
+    ["seq", String(packet.sequenceNumber)],
+    ["ack", String(packet.acknowledgementNumber)],
+    ["src port", String(packet.sourcePort)],
+    ["dst port", String(packet.destinationPort)],
+    ["payload", String(packet.payload?.length ?? 0)]
+  ];
+
+  return (
+    <section className="min-w-0 rounded-2xl border border-border/15 bg-background/45 p-4">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm font-semibold">Packet inspector</p>
+        <span className="rounded-full bg-primary/10 px-2.5 py-1 font-mono text-[11px] text-primary">
+          {packet.label}
+        </span>
+      </div>
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        {fields.map(([label, value]) => (
+          <div key={label} className="min-w-0 rounded-lg bg-secondary/12 px-2.5 py-2">
+            <p className="text-[11px] text-muted-foreground">{label}</p>
+            <p className="mt-1 break-all font-mono text-xs">{value}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function CompactTimeline({
+  events,
+  activePacketId,
+  onSelectPacket
+}: {
+  events: NetworkEvent[];
+  activePacketId?: string;
+  onSelectPacket: (packetId: string) => void;
+}) {
+  const scrollRef = useRef<HTMLOListElement>(null);
+
+  useEffect(() => {
+    const timeline = scrollRef.current;
+
+    if (!timeline) {
+      return;
+    }
+
+    timeline.scrollTo({ left: timeline.scrollWidth, behavior: "smooth" });
+  }, [events.length]);
+
+  return (
+    <section className="min-w-0 rounded-2xl border border-border/15 bg-background/45 p-4">
+      <div className="flex items-center justify-between gap-4">
+        <p className="text-sm font-semibold">Timeline</p>
+        <span className="text-xs text-muted-foreground">{events.length} packets</span>
+      </div>
+      {events.length === 0 ? (
+        <p className="mt-3 text-xs text-muted-foreground">SYN - SYN-ACK - ACK will appear here.</p>
+      ) : (
+        <div className="relative mt-3 min-w-0">
+          <ol
+            ref={scrollRef}
+            className="flex h-[72px] min-w-0 gap-2 overflow-x-auto overscroll-x-contain pb-2 pr-8"
+          >
+            {events.map((event) => {
+              const active = event.packetId === activePacketId;
+              return (
+                <li key={event.id} className="shrink-0">
+                  <button
+                    type="button"
+                    className={cn(
+                      "min-w-24 rounded-xl border border-border/10 bg-secondary/10 px-3 py-2 text-left transition hover:border-primary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      active && "border-primary/30 bg-primary/10"
+                    )}
+                    onClick={() => event.packetId && onSelectPacket(event.packetId)}
+                  >
+                    <span className="font-mono text-[11px] text-muted-foreground">
+                      {event.timestampLabel}
+                    </span>
+                    <span className="mt-1 block text-xs font-medium">
+                      {event.title.replace(" sent", "")}
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background/80 to-transparent" />
+        </div>
+      )}
+    </section>
   );
 }
