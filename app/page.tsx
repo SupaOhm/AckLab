@@ -39,7 +39,7 @@ export default function HomePage() {
                 Learn networking by moving packets.
               </h1>
               <p className="mt-6 max-w-lg text-[15px] leading-7 text-muted-foreground">
-                Practice subnetting, trigger protocol flows, and watch data travel across networks.
+                Trigger protocol flows and watch packets travel in real time.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Button asChild size="lg">
