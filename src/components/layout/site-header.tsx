@@ -43,7 +43,7 @@ export function SiteHeader() {
           </Button>
           <ThemeToggle />
           <Button asChild size="sm">
-            <Link href="/tools">Launch tools</Link>
+            <Link href="/learn/start">Start learning</Link>
           </Button>
         </div>
         <div className="flex items-center gap-1 md:hidden">
@@ -72,7 +72,7 @@ export function SiteHeader() {
               </Link>
             ))}
             <Button asChild className="mt-3">
-              <Link href="/tools">Launch tools</Link>
+              <Link href="/learn/start">Start learning</Link>
             </Button>
           </nav>
         </div>

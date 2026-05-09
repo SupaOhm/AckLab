@@ -232,6 +232,7 @@ export const curriculumModules: CurriculumModule[] = [
     ["subnet-mask", "Subnet mask", "Marks network bits and host bits."],
     ["cidr", "CIDR", "Prefix notation for subnet size."],
     ["default-gateway", "Default gateway", "Where packets go when the destination is remote."],
+    ["routing-basics", "Routing basics", "How routers choose a next hop for packets."],
     ["icmp", "ICMP", "Control messages used for errors and diagnostics."],
     ["ping", "Ping", "Tests reachability with ICMP echo."],
     ["traceroute", "Traceroute", "Reveals hops along a path."],

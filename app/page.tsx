@@ -1,6 +1,7 @@
-import { ArrowRight, Map } from "lucide-react";
+import { ArrowRight, FlaskConical, Map } from "lucide-react";
 import Link from "next/link";
 
+import { BeginnerOnboardingCard } from "@/components/curriculum/beginner-onboarding-card";
 import { GoalPathSelector } from "@/components/curriculum/goal-path-selector";
 import { ModuleCard } from "@/components/curriculum/module-card";
 import { SiteFooter } from "@/components/layout/site-footer";
@@ -29,41 +30,46 @@ export default function HomePage() {
       <main>
         {/* Hero — learning-focused entry */}
         <section className="relative overflow-hidden border-b border-border/20">
-          <div className="relative mx-auto grid max-w-6xl content-center gap-16 px-6 py-28 sm:px-8 lg:grid-cols-[1fr_1fr] lg:px-10 lg:py-36">
-            <div className="max-w-xl">
+          <div className="relative mx-auto grid min-h-[calc(100svh-3.5rem)] max-w-6xl content-center gap-8 px-6 py-10 sm:px-8 sm:py-14 lg:grid-cols-[0.7fr_1.3fr] lg:px-10">
+            <div className="max-w-lg self-center">
               <Badge variant="outline" className="bg-background/40">
                 Interactive networking fundamentals
               </Badge>
               <h1 className="mt-6 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl sm:leading-[1.15]">
-                Learn networking by causing packets to move.
+                Learn networking by moving packets.
               </h1>
               <p className="mt-6 max-w-lg text-[15px] leading-7 text-muted-foreground">
-                Practice subnetting, trigger protocol flows, and understand how data travels across
-                networks through interactive labs you can control.
+                Practice subnetting, trigger protocol flows, and watch data travel across networks.
               </p>
-              <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Button asChild size="lg">
-                  <Link href="/tools/binary">
-                    Start with Binary
+                  <Link href="/learn/start">
+                    Start learning
                     <ArrowRight className="size-4" />
                   </Link>
                 </Button>
                 <Button asChild size="lg" variant="outline">
-                  <Link href="/learn">
-                    Open Learning Map
-                    <Map className="size-4" />
+                  <Link href="/learn#labs">
+                    Explore labs
+                    <FlaskConical className="size-4" />
                   </Link>
                 </Button>
               </div>
-              <p className="mt-8 text-sm leading-6 text-muted-foreground/70">
-                Pick a concept, create a network event, inspect the packet, then read why it
-                happened.
-              </p>
+              <Button asChild variant="ghost" className="mt-3 px-0 text-primary">
+                <Link href="/learn">
+                  Open Learning Map
+                  <Map className="size-4" />
+                </Link>
+              </Button>
             </div>
-            <div className="hidden lg:block">
+            <div className="self-center">
               <NetworkPathDiagram />
             </div>
           </div>
+        </section>
+
+        <section className="mx-auto max-w-6xl px-6 py-12 sm:px-8 lg:px-10">
+          <BeginnerOnboardingCard />
         </section>
 
         {/* Network fundamentals map */}
