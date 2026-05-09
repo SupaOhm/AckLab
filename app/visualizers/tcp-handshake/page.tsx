@@ -3,7 +3,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { TcpHandshakeVisualizer } from "@/features/tcp-handshake/components/tcp-handshake-visualizer";
 
 export const metadata = {
-  title: "TCP Handshake Visualizer"
+  title: "TCP Socket Lab"
 };
 
 export default function TcpHandshakePage() {
@@ -11,8 +11,8 @@ export default function TcpHandshakePage() {
     <PlatformShell>
       <PageHeader
         eyebrow="Transport layer"
-        title="TCP 3-Way Handshake"
-        description="Watch the three packets that establish a reliable TCP connection before data is sent."
+        title="TCP Socket Lab"
+        description="Open a simulated connection, send data, inspect packets, and observe how TCP state changes."
       />
       <TcpHandshakeVisualizer />
     </PlatformShell>

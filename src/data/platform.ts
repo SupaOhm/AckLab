@@ -4,7 +4,7 @@ export const featureHighlights = [
   {
     title: "Visual first networking",
     description:
-      "Packets, layers, subnets, and routing behavior are represented as interactive systems instead of static diagrams."
+      "Packets, layers, subnets, and routing behavior are represented as controllable systems instead of static diagrams."
   },
   {
     title: "Practical developer tools",
@@ -28,7 +28,7 @@ export const learningPaths = [
   },
   {
     title: "Protocol Flows",
-    description: "Watch connection setup and name resolution move step by step.",
+    description: "Trigger connection setup and name resolution, then inspect the packets created.",
     difficulty: "Beginner",
     tools: ["TCP Handshake", "DNS Flow"],
     href: "/visualizers/tcp-handshake"
@@ -52,7 +52,8 @@ export const learningPaths = [
 export const visualizerCards: VisualizerCard[] = [
   {
     title: "TCP 3-Way Handshake",
-    description: "Animate SYN, SYN-ACK, and ACK exchange between client and server.",
+    description:
+      "Open a simulated socket, send payloads, and inspect TCP flags, seq, and ack values.",
     href: "/visualizers/tcp-handshake",
     status: "Live",
     signal: "L4"

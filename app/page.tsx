@@ -23,11 +23,11 @@ export default function HomePage() {
                 Interactive networking fundamentals
               </Badge>
               <h1 className="mt-6 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl sm:leading-[1.15]">
-                Learn networking by watching packets move.
+                Learn networking by causing packets to move.
               </h1>
               <p className="mt-6 max-w-lg text-[15px] leading-7 text-muted-foreground">
-                Practice subnetting, inspect protocol flows, and understand how data travels across
-                networks — all through interactive visual tools you can use right now.
+                Practice subnetting, trigger protocol flows, and understand how data travels across
+                networks through interactive labs you can control.
               </p>
               <div className="mt-10 flex flex-col gap-3 sm:flex-row">
                 <Button asChild size="lg">
@@ -37,11 +37,12 @@ export default function HomePage() {
                   </Link>
                 </Button>
                 <Button asChild size="lg" variant="outline">
-                  <Link href="/visualizers/tcp-handshake">Watch TCP Handshake</Link>
+                  <Link href="/visualizers/tcp-handshake">Open TCP Lab</Link>
                 </Button>
               </div>
               <p className="mt-8 text-sm leading-6 text-muted-foreground/70">
-                Pick one concept, adjust the inputs, then read the explanation beside the diagram.
+                Pick a concept, create a network event, inspect the packet, then read why it
+                happened.
               </p>
             </div>
             <div className="hidden lg:block">
@@ -92,8 +93,8 @@ export default function HomePage() {
           <div className="mx-auto max-w-6xl px-6 py-28 sm:px-8 lg:px-10">
             <SectionHeading
               eyebrow="Visualizers"
-              title="See the hidden steps behind everyday networking."
-              description="Animations are intentionally slow and step-based, so you can connect each packet movement to the reason it happens."
+              title="Interact with the hidden systems behind everyday networking."
+              description="Labs are designed around user actions: create an event, watch packets move, inspect headers, then connect the behavior to plain-English protocol meaning."
               action={
                 <Button asChild variant="outline">
                   <Link href="/tools">Browse tools</Link>
