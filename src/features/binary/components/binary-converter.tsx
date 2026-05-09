@@ -55,23 +55,22 @@ export function BinaryConverter() {
   const ipOctets = useMemo(() => parseIpv4Address(ipValue), [ipValue]);
 
   return (
-    <div className="grid gap-8">
+    <div className="grid gap-10">
       <ToolWorkspace
         title="Practice workspace"
         description="Convert one octet at a time, then inspect the four octets inside an IPv4 address."
       >
-        <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
-          <section className="rounded-xl bg-background/38 p-5">
-            <div className="mb-5 flex items-center gap-2">
-              <Calculator className="size-5 text-primary" />
-              <div>
-                <h2 className="text-base font-semibold">Enter values</h2>
-                <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                  Use values from 0 to 255, the range of one IPv4 octet.
-                </p>
-              </div>
+        <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
+          {/* Input controls */}
+          <section className="space-y-6">
+            <div className="flex items-center gap-2.5">
+              <Calculator className="size-4 text-primary" />
+              <h2 className="text-sm font-semibold">Enter values</h2>
             </div>
-            <div className="grid gap-5">
+            <p className="text-sm leading-7 text-muted-foreground">
+              Use values from 0 to 255, the range of one IPv4 octet.
+            </p>
+            <div className="space-y-5">
               <div className="grid gap-2">
                 <Label htmlFor="decimal">Decimal octet</Label>
                 <Input
@@ -99,28 +98,29 @@ export function BinaryConverter() {
             </div>
           </section>
 
-          <section className="rounded-xl bg-background/25 p-5">
-            <div className="mb-6 flex items-center gap-2">
-              <Binary className="size-5 text-primary" />
+          {/* Visualization area */}
+          <section className="space-y-6">
+            <div className="flex items-center gap-2.5">
+              <Binary className="size-4 text-primary" />
               <div>
-                <h2 className="text-base font-semibold">Decimal number to binary bits</h2>
-                <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                <h2 className="text-sm font-semibold">Decimal number to binary bits</h2>
+                <p className="mt-1 text-sm leading-7 text-muted-foreground">
                   Each bit represents a power of two. Add the active bit values to get the decimal
                   number.
                 </p>
               </div>
             </div>
-            <motion.div layout className="grid gap-5">
+            <motion.div layout className="space-y-5">
               <div>
-                <p className="text-sm text-muted-foreground">Decimal to binary</p>
-                <p className="mt-2 font-mono text-4xl font-semibold text-primary">
+                <p className="text-xs text-muted-foreground">Decimal to binary</p>
+                <p className="mt-2 font-mono text-3xl font-semibold text-primary">
                   {decimalValue} = {decimalBinary}
                 </p>
               </div>
               <BitGroupVisualizer octets={[decimalBinary]} cidr={8} />
-              <div className="rounded-lg bg-secondary/22 p-4">
-                <p className="text-sm text-muted-foreground">Binary to decimal</p>
-                <p className="mt-1 font-mono text-2xl font-semibold">
+              <div className="rounded-lg bg-secondary/12 p-4">
+                <p className="text-xs text-muted-foreground">Binary to decimal</p>
+                <p className="mt-1 font-mono text-xl font-semibold">
                   {binaryValue || "0"} = {binaryDecimal ?? "invalid"}
                 </p>
               </div>
@@ -129,7 +129,7 @@ export function BinaryConverter() {
         </div>
       </ToolWorkspace>
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_0.8fr]">
+      <div className="grid gap-6 lg:grid-cols-[1fr_0.8fr]">
         <ExplanationPanel title="IPv4 octets">
           {ipOctets ? (
             <div className="grid gap-3">

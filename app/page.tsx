@@ -7,30 +7,29 @@ import { SectionHeading } from "@/components/shared/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { NetworkBackground } from "@/components/visualizations/network-background";
 import { NetworkPathDiagram } from "@/components/visualizations/network-path-diagram";
-import { learningPaths, roadmapItems, visualizerCards } from "@/data/platform";
+import { learningPaths, visualizerCards, roadmapItems } from "@/data/platform";
 
 export default function HomePage() {
   return (
     <div className="min-h-screen">
       <SiteHeader />
       <main>
-        <section className="relative overflow-hidden border-b border-border/45">
-          <NetworkBackground />
-          <div className="relative mx-auto grid min-h-[calc(100vh-4rem)] max-w-7xl content-center gap-14 px-4 py-20 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8">
-            <div className="max-w-3xl">
+        {/* Hero — learning-focused entry */}
+        <section className="relative overflow-hidden border-b border-border/20">
+          <div className="relative mx-auto grid max-w-6xl content-center gap-16 px-6 py-28 sm:px-8 lg:grid-cols-[1fr_1fr] lg:px-10 lg:py-36">
+            <div className="max-w-xl">
               <Badge variant="outline" className="bg-background/40">
                 Interactive networking fundamentals
               </Badge>
-              <h1 className="mt-6 text-5xl font-semibold tracking-normal text-foreground sm:text-6xl">
+              <h1 className="mt-6 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl sm:leading-[1.15]">
                 Learn networking by watching packets move.
               </h1>
-              <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
+              <p className="mt-6 max-w-lg text-[15px] leading-7 text-muted-foreground">
                 Practice subnetting, inspect protocol flows, and understand how data travels across
-                networks through interactive visual tools.
+                networks — all through interactive visual tools you can use right now.
               </p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <div className="mt-10 flex flex-col gap-3 sm:flex-row">
                 <Button asChild size="lg">
                   <Link href="/tools/subnet">
                     Start with Subnetting
@@ -41,32 +40,31 @@ export default function HomePage() {
                   <Link href="/visualizers/tcp-handshake">Watch TCP Handshake</Link>
                 </Button>
               </div>
-              <p className="mt-6 max-w-xl text-sm leading-6 text-muted-foreground">
-                Start with one concept, adjust the inputs, then read the explanation beside the
-                moving diagram.
+              <p className="mt-8 text-sm leading-6 text-muted-foreground/70">
+                Pick one concept, adjust the inputs, then read the explanation beside the diagram.
               </p>
             </div>
-            <NetworkPathDiagram />
+            <div className="hidden lg:block">
+              <NetworkPathDiagram />
+            </div>
           </div>
         </section>
 
-        <section id="platform" className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+        {/* Learning paths */}
+        <section id="platform" className="mx-auto max-w-6xl px-6 py-28 sm:px-8 lg:px-10">
           <SectionHeading
             eyebrow="Learning paths"
             title="Choose the concept you want to understand first."
             description="Each path starts with a working visual tool and a short explanation, so the concept is anchored to something you can change."
           />
-          <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-14 grid gap-6 md:grid-cols-2">
             {learningPaths.map((path) => (
-              <Card
-                key={path.title}
-                className="group h-full transition-colors hover:border-primary/35"
-              >
+              <Card key={path.title} className="group transition-colors hover:border-primary/20">
                 <CardHeader>
-                  <div className="mb-2 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
                     <Badge variant="secondary">{path.difficulty}</Badge>
                   </div>
-                  <CardTitle>{path.title}</CardTitle>
+                  <CardTitle className="text-lg">{path.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm leading-7 text-muted-foreground">{path.description}</p>
@@ -89,8 +87,9 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section id="visualizers" className="border-y border-border/45 bg-card/18">
-          <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+        {/* Visualizers */}
+        <section id="visualizers" className="border-y border-border/15 bg-card/10">
+          <div className="mx-auto max-w-6xl px-6 py-28 sm:px-8 lg:px-10">
             <SectionHeading
               eyebrow="Visualizers"
               title="See the hidden steps behind everyday networking."
@@ -101,19 +100,19 @@ export default function HomePage() {
                 </Button>
               }
             />
-            <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            <div className="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
               {visualizerCards.map((card) => (
                 <Link key={card.title} href={card.href}>
-                  <Card className="group h-full transition-all hover:-translate-y-0.5 hover:border-primary/45 hover:shadow-xl hover:shadow-primary/10">
+                  <Card className="group h-full transition-colors hover:border-primary/20">
                     <CardHeader>
                       <div className="flex items-center justify-between gap-3">
                         <Badge variant="success">{card.status}</Badge>
-                        <span className="font-mono text-xs text-primary">{card.signal}</span>
+                        <span className="font-mono text-xs text-primary/60">{card.signal}</span>
                       </div>
                       <CardTitle>{card.title}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-sm leading-6 text-muted-foreground">{card.description}</p>
+                      <p className="text-sm leading-7 text-muted-foreground">{card.description}</p>
                     </CardContent>
                   </Card>
                 </Link>
@@ -122,8 +121,9 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section id="roadmap" className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
-          <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+        {/* Roadmap */}
+        <section id="roadmap" className="mx-auto max-w-6xl px-6 py-28 sm:px-8 lg:px-10">
+          <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr]">
             <SectionHeading
               eyebrow="Roadmap"
               title="Clean MVP today, scalable platform tomorrow."
@@ -133,7 +133,7 @@ export default function HomePage() {
               {roadmapItems.map((item) => (
                 <div
                   key={item}
-                  className="rounded-md border border-border/70 bg-card/60 p-4 text-sm"
+                  className="rounded-lg border border-border/20 bg-card/25 p-4 text-sm leading-7"
                 >
                   {item}
                 </div>

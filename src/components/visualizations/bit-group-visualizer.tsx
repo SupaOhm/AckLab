@@ -19,20 +19,20 @@ export function BitGroupVisualizer({
 
   return (
     <div className="space-y-4" aria-label="Grouped binary bit visualization">
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
         <span className="inline-flex items-center gap-2">
-          <span className="size-2 rounded-full bg-primary" />
+          <span className="size-2 rounded-full bg-primary/70" />
           Network prefix
         </span>
         <span className="inline-flex items-center gap-2">
-          <span className="size-2 rounded-full bg-emerald-300" />
+          <span className="size-2 rounded-full bg-emerald-300/70" />
           Host space
         </span>
       </div>
-      <div className="grid gap-3 lg:grid-cols-4">
+      <div className="grid gap-4 lg:grid-cols-4">
         {octets.map((octet, octetIndex) => (
-          <div key={`${octetIndex}-${octet}`} className="rounded-lg bg-background/45 p-3">
-            <p className="mb-2 text-xs text-muted-foreground">Octet {octetIndex + 1}</p>
+          <div key={`${octetIndex}-${octet}`} className="rounded-lg bg-secondary/8 p-3">
+            <p className="mb-2.5 text-xs text-muted-foreground/60">Octet {octetIndex + 1}</p>
             <div className="grid grid-cols-8 gap-1">
               {octet.split("").map((bit, localIndex) => {
                 const currentIndex = bitIndex++;
@@ -49,13 +49,13 @@ export function BitGroupVisualizer({
                       "relative grid aspect-square place-items-center rounded-md font-mono text-sm",
                       compact && "text-xs",
                       networkBit
-                        ? "bg-primary/14 text-primary ring-1 ring-primary/22"
-                        : "bg-emerald-400/10 text-emerald-300 ring-1 ring-emerald-400/16"
+                        ? "bg-primary/10 text-primary ring-1 ring-primary/15"
+                        : "bg-emerald-400/8 text-emerald-300 ring-1 ring-emerald-400/12"
                     )}
                   >
                     {bit}
                     {boundaryAfter && localIndex !== 7 ? (
-                      <span className="absolute -right-1.5 top-0 h-full w-px bg-foreground/60" />
+                      <span className="absolute -right-1.5 top-0 h-full w-px bg-foreground/40" />
                     ) : null}
                   </motion.div>
                 );

@@ -12,7 +12,7 @@ interface StepTimelineProps {
 
 export function StepTimeline({ steps, activeIndex, onSelect }: StepTimelineProps) {
   return (
-    <div className="grid gap-3">
+    <div className="grid gap-1.5">
       {steps.map((step, index) => (
         <button
           key={`${step.label}-${step.title}`}
@@ -20,24 +20,24 @@ export function StepTimeline({ steps, activeIndex, onSelect }: StepTimelineProps
           disabled={!onSelect}
           className={cn(
             "group flex gap-3 rounded-lg p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-            index === activeIndex ? "bg-primary/10" : "hover:bg-secondary/35"
+            index === activeIndex ? "bg-primary/8" : "hover:bg-secondary/20"
           )}
           onClick={() => onSelect?.(index)}
         >
           <span
             className={cn(
-              "grid size-7 shrink-0 place-items-center rounded-full border text-xs font-semibold",
+              "grid size-6 shrink-0 place-items-center rounded-full border text-[11px] font-semibold",
               index === activeIndex
                 ? "border-primary bg-primary text-primary-foreground"
-                : "border-border text-muted-foreground"
+                : "border-border/50 text-muted-foreground"
             )}
           >
             {index + 1}
           </span>
           <span>
-            <span className="block text-sm font-semibold text-foreground">{step.title}</span>
+            <span className="block text-sm font-medium text-foreground">{step.title}</span>
             {step.description ? (
-              <span className="mt-1 block text-xs leading-5 text-muted-foreground">
+              <span className="mt-0.5 block text-xs leading-5 text-muted-foreground">
                 {step.description}
               </span>
             ) : null}

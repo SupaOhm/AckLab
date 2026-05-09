@@ -12,9 +12,9 @@ export function PracticePrompt({
   children
 }: PracticePromptProps) {
   return (
-    <section className="rounded-xl border border-dashed border-primary/30 bg-primary/5 p-5">
+    <section className="rounded-xl border border-dashed border-primary/20 bg-primary/[.03] p-6">
       <p className="text-sm font-semibold text-foreground">{title}</p>
-      <p className="mt-2 text-sm leading-6 text-muted-foreground">{prompt}</p>
+      <p className="mt-2 text-sm leading-7 text-muted-foreground">{prompt}</p>
       {children ? <div className="mt-4 flex flex-wrap gap-2">{children}</div> : null}
     </section>
   );

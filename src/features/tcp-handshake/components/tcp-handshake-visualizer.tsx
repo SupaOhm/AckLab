@@ -61,26 +61,23 @@ export function TcpHandshakeVisualizer() {
   const timelineSteps = steps.slice(1);
 
   return (
-    <div className="grid gap-8">
+    <div className="grid gap-10">
       <ToolWorkspace
         title="Packet exchange"
         description="Play the handshake one packet at a time. The client starts, the server responds, then the client confirms."
       >
-        <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
-          <div className="relative min-h-[430px] overflow-hidden rounded-xl bg-background/38 p-6">
-            <div className="network-grid absolute inset-0 opacity-20" />
-            <div className="relative z-10 flex h-[340px] items-center justify-between">
+        <div className="grid gap-8 xl:grid-cols-[1fr_320px]">
+          {/* Animation area — primary focus */}
+          <div className="relative min-h-[380px] overflow-hidden rounded-xl bg-secondary/8 p-6">
+            <div className="network-grid absolute inset-0 opacity-12" />
+            <div className="relative z-10 flex h-[300px] items-center justify-between px-4">
               <Node label="Client" subtitle="10.0.0.12" />
-              <div className="absolute left-[18%] right-[18%] top-1/2 h-px bg-border/70" />
-              <div className="absolute left-[24%] right-[24%] top-[calc(50%+28px)] hidden justify-between text-xs text-muted-foreground sm:flex">
-                <span>request connection</span>
-                <span>confirm state</span>
-              </div>
+              <div className="absolute left-[18%] right-[18%] top-1/2 h-px bg-border/40" />
               <Node label="Server" subtitle="203.0.113.10" align="right" />
               {step > 0 ? (
                 <motion.div
                   key={step}
-                  className="absolute top-[calc(50%-20px)] rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20"
+                  className="absolute top-[calc(50%-18px)] rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm"
                   initial={{ left: direction === "client" ? "18%" : "74%", opacity: 0, scale: 0.9 }}
                   animate={{ left: direction === "client" ? "74%" : "18%", opacity: 1, scale: 1 }}
                   transition={{ duration: 1.1, ease: "easeInOut" }}
@@ -91,13 +88,15 @@ export function TcpHandshakeVisualizer() {
             </div>
           </div>
 
-          <div className="rounded-xl bg-background/38 p-5">
-            <div className="mb-5 flex flex-wrap gap-2">
-              <Button onClick={() => setPlaying((value) => !value)}>
+          {/* Controls + timeline */}
+          <div className="space-y-6">
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" onClick={() => setPlaying((value) => !value)}>
                 {playing ? <Pause className="size-4" /> : <Play className="size-4" />}
                 {playing ? "Pause" : "Play"}
               </Button>
               <Button
+                size="sm"
                 variant="outline"
                 onClick={() => {
                   setPlaying(false);
@@ -120,7 +119,7 @@ export function TcpHandshakeVisualizer() {
         </div>
       </ToolWorkspace>
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_0.75fr]">
+      <div className="grid gap-6 lg:grid-cols-[1fr_0.75fr]">
         <ExplanationPanel title={active.title}>
           <p>{active.description}</p>
           <p>
@@ -145,10 +144,10 @@ function Node({
 }) {
   return (
     <div className={align === "right" ? "text-right" : undefined}>
-      <div className="grid size-28 place-items-center rounded-xl border border-primary/30 bg-primary/10">
-        <div className="size-12 rounded-lg bg-primary/85" />
+      <div className="grid size-24 place-items-center rounded-xl border border-primary/20 bg-primary/6">
+        <div className="size-10 rounded-lg bg-primary/60" />
       </div>
-      <p className="mt-3 font-semibold">{label}</p>
+      <p className="mt-3 text-sm font-semibold">{label}</p>
       <p className="font-mono text-xs text-muted-foreground">{subtitle}</p>
     </div>
   );

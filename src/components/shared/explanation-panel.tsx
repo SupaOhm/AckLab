@@ -12,12 +12,12 @@ export function ExplanationPanel({ title, children, className }: ExplanationPane
   return (
     <section
       className={cn(
-        "rounded-xl border border-border/40 bg-secondary/20 p-5 text-sm leading-7 text-muted-foreground",
+        "rounded-xl border border-border/15 bg-secondary/12 p-6 text-sm leading-7 text-muted-foreground",
         className
       )}
     >
-      <h2 className="text-base font-semibold tracking-normal text-foreground">{title}</h2>
-      <div className="mt-3 space-y-3">{children}</div>
+      <h2 className="text-base font-semibold tracking-tight text-foreground">{title}</h2>
+      <div className="mt-4 space-y-3">{children}</div>
     </section>
   );
 }

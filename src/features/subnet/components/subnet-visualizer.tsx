@@ -46,23 +46,23 @@ export function SubnetVisualizer() {
   const result = useMemo(() => calculateSubnet(ipValue, cidrValue), [ipValue, cidrValue]);
 
   return (
-    <div className="grid gap-8">
+    <div className="grid gap-10">
       <ToolWorkspace
         title="Interactive workspace"
         description="Change the address or prefix length and watch the network and host portions separate."
       >
-        <div className="grid gap-6 xl:grid-cols-[300px_1fr_320px]">
-          <section className="rounded-xl bg-background/38 p-5">
-            <div className="mb-5 flex items-center gap-2">
-              <Network className="size-5 text-primary" />
-              <div>
-                <h2 className="text-base font-semibold">Try an address</h2>
-                <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                  Start with an IP address and choose how many leading bits identify the network.
-                </p>
-              </div>
+        <div className="grid gap-8 xl:grid-cols-[280px_1fr_300px]">
+          {/* Controls — left column */}
+          <section className="space-y-6">
+            <div className="flex items-center gap-2.5">
+              <Network className="size-4 text-primary" />
+              <h2 className="text-sm font-semibold">Try an address</h2>
             </div>
-            <div className="grid gap-5">
+            <p className="text-sm leading-7 text-muted-foreground">
+              Start with an IP address and choose how many leading bits identify the network.
+            </p>
+
+            <div className="space-y-5">
               <div className="grid gap-2">
                 <Label htmlFor="ip">IPv4 address</Label>
                 <Input id="ip" placeholder="192.168.10.42" {...register("ip")} />
@@ -84,7 +84,7 @@ export function SubnetVisualizer() {
                       value={field.value}
                       onChange={(event) => field.onChange(Number(event.target.value))}
                     />
-                    <div className="flex justify-between text-xs text-muted-foreground">
+                    <div className="flex justify-between text-xs text-muted-foreground/60">
                       <span>/0</span>
                       <span>/16</span>
                       <span>/32</span>
@@ -92,9 +92,9 @@ export function SubnetVisualizer() {
                   </div>
                 )}
               />
-              <div className="grid gap-2">
-                <p className="text-sm font-medium">Try these examples</p>
-                <div className="flex flex-wrap gap-2">
+              <div className="space-y-2.5">
+                <p className="text-xs font-medium text-muted-foreground">Examples</p>
+                <div className="flex flex-wrap gap-1.5">
                   {[
                     ["192.168.1.10", 24],
                     ["10.0.0.5", 8],
@@ -118,18 +118,19 @@ export function SubnetVisualizer() {
             </div>
           </section>
 
-          <section className="min-w-0 rounded-xl bg-background/25 p-5">
-            <div className="mb-5">
-              <h2 className="text-base font-semibold">Bits breakdown</h2>
-              <p className="mt-1 text-sm leading-6 text-muted-foreground">
+          {/* Bit visualization — center (primary focus) */}
+          <section className="min-w-0 space-y-5">
+            <div>
+              <h2 className="text-sm font-semibold">Bits breakdown</h2>
+              <p className="mt-1.5 text-sm leading-7 text-muted-foreground">
                 The first {cidrValue} bits are the network prefix. The remaining {32 - cidrValue}{" "}
                 bits are host space.
               </p>
             </div>
             {result ? (
-              <div className="grid gap-3">
+              <div className="space-y-5">
                 <BitGroupVisualizer octets={result.binaryIp} cidr={result.cidr} />
-                <p className="rounded-lg bg-secondary/25 p-4 text-sm leading-7 text-muted-foreground">
+                <p className="rounded-lg bg-secondary/12 p-4 text-sm leading-7 text-muted-foreground">
                   /{result.cidr} means the first {result.cidr} bits identify the network. The
                   remaining {32 - result.cidr} bits are available for host addresses inside that
                   network.
@@ -142,28 +143,31 @@ export function SubnetVisualizer() {
             )}
           </section>
 
-          <section className="rounded-xl bg-background/38 p-5">
-            <h2 className="text-base font-semibold">Result</h2>
-            <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              Use the network address and host range to understand what belongs in this subnet.
-            </p>
+          {/* Results — right column */}
+          <section className="space-y-5">
+            <div>
+              <h2 className="text-sm font-semibold">Result</h2>
+              <p className="mt-1.5 text-sm leading-7 text-muted-foreground">
+                Network address and host range for this subnet.
+              </p>
+            </div>
             {result ? (
-              <div className="mt-5 grid gap-5">
+              <div className="space-y-6">
                 <div>
-                  <p className="text-sm text-muted-foreground">Network address</p>
-                  <p className="mt-1 font-mono text-3xl font-semibold text-primary">
+                  <p className="text-xs text-muted-foreground">Network address</p>
+                  <p className="mt-1.5 font-mono text-2xl font-semibold text-primary">
                     {result.networkAddress}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Usable host range</p>
-                  <p className="mt-1 font-mono text-sm leading-6">
+                  <p className="text-xs text-muted-foreground">Usable host range</p>
+                  <p className="mt-1.5 font-mono text-sm leading-7">
                     {result.firstUsableHost}
                     <br />
                     to {result.lastUsableHost}
                   </p>
                 </div>
-                <dl className="grid gap-3 border-t border-border/40 pt-4 text-sm">
+                <dl className="space-y-3 border-t border-border/15 pt-5 text-sm">
                   <Detail label="Subnet mask" value={result.subnetMask} />
                   <Detail label="Broadcast" value={result.broadcastAddress} />
                   <Detail label="Total hosts" value={result.totalHosts.toLocaleString()} />
@@ -171,15 +175,13 @@ export function SubnetVisualizer() {
                 </dl>
               </div>
             ) : (
-              <p className="mt-5 text-sm text-muted-foreground">
-                Results appear after valid input.
-              </p>
+              <p className="text-sm text-muted-foreground">Results appear after valid input.</p>
             )}
           </section>
         </div>
       </ToolWorkspace>
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_0.85fr]">
+      <div className="grid gap-6 lg:grid-cols-[1fr_0.85fr]">
         <ExplanationPanel title="What to notice">
           {result ? (
             <p>

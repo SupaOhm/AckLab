@@ -39,40 +39,41 @@ export function DnsFlowVisualizer() {
   const active = dnsFlowSteps[step];
 
   return (
-    <div className="grid gap-8">
+    <div className="grid gap-10">
       <ToolWorkspace
         title="Recursive DNS lookup"
         description="Follow the question from your browser to the server that can answer it."
       >
-        <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
-          <div className="relative min-h-[360px] overflow-hidden rounded-xl bg-background/35 p-6">
-            <div className="network-grid absolute inset-0 opacity-18" />
-            <div className="relative z-10 grid gap-4 md:grid-cols-6">
+        <div className="grid gap-8 xl:grid-cols-[1fr_340px]">
+          {/* Node visualization */}
+          <div className="relative min-h-[320px] overflow-hidden rounded-xl bg-secondary/8 p-6">
+            <div className="network-grid absolute inset-0 opacity-10" />
+            <div className="relative z-10 grid gap-3 md:grid-cols-6">
               {nodes.map((node, index) => (
                 <button
                   key={node}
                   type="button"
-                  className={`relative flex min-h-28 flex-col items-center justify-center rounded-xl p-3 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                  className={`relative flex min-h-24 flex-col items-center justify-center rounded-xl p-3 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                     index === step
-                      ? "bg-primary/12 text-primary ring-1 ring-primary/30"
+                      ? "bg-primary/10 text-primary ring-1 ring-primary/20"
                       : index < step
-                        ? "bg-secondary/28 text-foreground"
-                        : "bg-secondary/16 text-muted-foreground"
+                        ? "bg-secondary/15 text-foreground"
+                        : "bg-secondary/8 text-muted-foreground"
                   }`}
                   onClick={() => {
                     setPlaying(false);
                     setStep(index);
                   }}
                 >
-                  <span className="mb-3 grid size-7 place-items-center rounded-full border border-current text-xs">
+                  <span className="mb-2.5 grid size-6 place-items-center rounded-full border border-current text-[11px]">
                     {index + 1}
                   </span>
-                  <span className="text-sm font-semibold">{node}</span>
+                  <span className="text-xs font-semibold">{node}</span>
                 </button>
               ))}
               <motion.div
                 key={step}
-                className="absolute top-[calc(50%-7px)] hidden size-3 rounded-full bg-accent shadow-lg shadow-accent/25 md:block"
+                className="absolute top-[calc(50%-5px)] hidden size-2.5 rounded-full bg-accent/80 md:block"
                 initial={{ left: `${Math.max((step - 1) * 17.8 + 8, 8)}%`, opacity: 0.4 }}
                 animate={{ left: `${Math.min(step * 17.8 + 8, 92)}%`, opacity: 1 }}
                 transition={{ duration: 0.65, ease: "easeInOut" }}
@@ -80,13 +81,15 @@ export function DnsFlowVisualizer() {
             </div>
           </div>
 
-          <div className="rounded-xl bg-background/38 p-5">
-            <div className="mb-5 flex flex-wrap gap-2">
-              <Button onClick={() => setPlaying((value) => !value)}>
+          {/* Controls + step timeline */}
+          <div className="space-y-6">
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" onClick={() => setPlaying((value) => !value)}>
                 {playing ? <Pause className="size-4" /> : <Play className="size-4" />}
                 {playing ? "Pause" : "Play"}
               </Button>
               <Button
+                size="sm"
                 variant="outline"
                 onClick={() => {
                   setPlaying(false);
@@ -113,7 +116,7 @@ export function DnsFlowVisualizer() {
         </div>
       </ToolWorkspace>
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_0.75fr]">
+      <div className="grid gap-6 lg:grid-cols-[1fr_0.75fr]">
         <ExplanationPanel title={active.title}>
           <p>{active.description}</p>
           <p>

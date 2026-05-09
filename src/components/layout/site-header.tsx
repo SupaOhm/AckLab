@@ -14,35 +14,35 @@ export function SiteHeader() {
   const setCommandOpen = useUiStore((state) => state.setCommandOpen);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/70 bg-background/70 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2 font-semibold tracking-normal">
-          <span className="grid size-8 place-items-center rounded-md bg-primary text-primary-foreground shadow-lg shadow-primary/20">
+    <header className="sticky top-0 z-40 border-b border-border/20 bg-background/80 backdrop-blur-xl">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6 sm:px-8 lg:px-10">
+        <Link href="/" className="flex items-center gap-2.5 font-semibold tracking-normal">
+          <span className="grid size-8 place-items-center rounded-lg bg-primary text-primary-foreground">
             A
           </span>
           <span>AckLab</span>
         </Link>
-        <nav className="hidden items-center gap-6 md:flex" aria-label="Main navigation">
+        <nav className="hidden items-center gap-7 md:flex" aria-label="Main navigation">
           {marketingNavItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+              className="text-[13px] text-muted-foreground transition-colors hover:text-foreground"
             >
               {item.label}
             </Link>
           ))}
         </nav>
         <div className="hidden items-center gap-2 md:flex">
-          <Button variant="outline" onClick={() => setCommandOpen(true)}>
+          <Button variant="ghost" size="sm" onClick={() => setCommandOpen(true)}>
             <Search className="size-4" />
-            Command
-            <kbd className="rounded border border-border bg-secondary px-1.5 py-0.5 text-[10px] text-muted-foreground">
-              K
+            <span className="text-muted-foreground">Search</span>
+            <kbd className="ml-1 rounded border border-border/50 bg-secondary/40 px-1.5 py-0.5 text-[10px] text-muted-foreground">
+              ⌘K
             </kbd>
           </Button>
           <ThemeToggle />
-          <Button asChild>
+          <Button asChild size="sm">
             <Link href="/tools">Launch tools</Link>
           </Button>
         </div>
@@ -59,19 +59,19 @@ export function SiteHeader() {
         </div>
       </div>
       {open ? (
-        <div className="border-t border-border/70 bg-background/95 px-4 py-4 md:hidden">
-          <nav className="grid gap-2" aria-label="Mobile navigation">
+        <div className="border-t border-border/20 bg-background/95 px-6 py-4 md:hidden">
+          <nav className="grid gap-1" aria-label="Mobile navigation">
             {marketingNavItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-secondary hover:text-foreground"
+                className="rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-secondary/30 hover:text-foreground"
                 onClick={() => setOpen(false)}
               >
                 {item.label}
               </Link>
             ))}
-            <Button asChild className="mt-2">
+            <Button asChild className="mt-3">
               <Link href="/tools">Launch tools</Link>
             </Button>
           </nav>
