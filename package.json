@@ -1,0 +1,59 @@
+{
+  "name": "acklab",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Interactive networking fundamentals learning, visualization, and simulation platform.",
+  "packageManager": "pnpm@11.0.9",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --max-warnings=0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "docker:build": "docker build -t acklab:local .",
+    "docker:run": "docker run --rm -p 3000:3000 acklab:local",
+    "docker:compose": "docker compose up --build",
+    "clean": "rm -rf .next out coverage tsconfig.tsbuildinfo",
+    "precommit": "lint-staged && pnpm typecheck",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "@radix-ui/react-slot": "^1.2.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
+    "framer-motion": "^12.38.0",
+    "lucide-react": "^1.14.0",
+    "next": "16.2.6",
+    "next-themes": "^0.4.6",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "react-hook-form": "^7.68.0",
+    "tailwind-merge": "^3.4.0",
+    "zod": "^4.1.13",
+    "zustand": "^5.0.9"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.0",
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.1",
+    "eslint-config-next": "16.2.6",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.6.2",
+    "tailwindcss": "^4.3.0",
+    "typescript": "^5.9.3"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --max-warnings=0",
+      "prettier --write"
+    ],
+    "*.{json,md,css}": "prettier --write"
+  }
+}
