@@ -6,7 +6,8 @@ const unlockedLabs = new Set([
   "tcp-handshake",
   "dns-flow",
   "osi-model",
-  "routing-visualizer"
+  "routing-visualizer",
+  "arp-broadcast-lab"
 ]);
 
 const routeById: Record<string, string> = {
@@ -15,7 +16,8 @@ const routeById: Record<string, string> = {
   "tcp-handshake": "/visualizers/tcp-handshake",
   "dns-flow": "/visualizers/dns-flow",
   "osi-model": "/visualizers/osi-model",
-  "routing-visualizer": "/visualizers/routing"
+  "routing-visualizer": "/visualizers/routing",
+  "arp-broadcast-lab": "/visualizers/arp-broadcast"
 };
 
 export function module(input: Omit<CurriculumModule, "status" | "route">): CurriculumModule {

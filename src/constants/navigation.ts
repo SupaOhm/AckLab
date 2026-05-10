@@ -11,6 +11,7 @@ import {
   Home,
   Layers3,
   Network,
+  Radio,
   Route,
   ShieldCheck
 } from "lucide-react";
@@ -64,6 +65,12 @@ export const platformNavItems = [
     href: "/visualizers/routing",
     icon: Route,
     description: "Path selection"
+  },
+  {
+    label: "ARP Broadcast",
+    href: "/visualizers/arp-broadcast",
+    icon: Radio,
+    description: "MAC discovery"
   }
 ] as const;
 
@@ -84,7 +91,8 @@ export const platformNavGroups = [
       platformNavItems[8],
       platformNavItems[9],
       platformNavItems[10],
-      platformNavItems[11]
+      platformNavItems[11],
+      platformNavItems[12]
     ]
   },
   {

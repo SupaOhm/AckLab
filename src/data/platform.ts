@@ -78,6 +78,13 @@ export const visualizerCards: VisualizerCard[] = [
     href: "/visualizers/routing",
     status: "Live",
     signal: "Graph"
+  },
+  {
+    title: "ARP Broadcast Lab",
+    description: "Broadcast an ARP request and watch the matching host reply with its MAC address.",
+    href: "/visualizers/arp-broadcast",
+    status: "Live",
+    signal: "L2"
   }
 ];
 
