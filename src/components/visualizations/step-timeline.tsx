@@ -20,7 +20,7 @@ export function StepTimeline({ steps, activeIndex, onSelect }: StepTimelineProps
           disabled={!onSelect}
           className={cn(
             "group flex gap-3 rounded-lg p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-            index === activeIndex ? "bg-primary/8" : "hover:bg-secondary/20"
+            index === activeIndex ? "bg-primary/12" : "hover:bg-secondary/30"
           )}
           onClick={() => onSelect?.(index)}
         >

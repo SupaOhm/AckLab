@@ -124,7 +124,7 @@ function DnsCanvas({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-xl bg-secondary/8 p-6 ${large ? "min-h-[460px]" : "min-h-[320px]"}`}
+      className={`relative overflow-hidden rounded-xl bg-secondary/15 p-6 ${large ? "min-h-[460px]" : "min-h-[320px]"}`}
     >
       <div className="network-grid absolute inset-0 opacity-10" />
       <div className="relative z-10 grid gap-3 md:grid-cols-6">
@@ -134,10 +134,10 @@ function DnsCanvas({
             type="button"
             className={`relative flex min-h-24 flex-col items-center justify-center rounded-xl p-3 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
               index === step
-                ? "bg-primary/10 text-primary ring-1 ring-primary/20"
+                ? "bg-primary/12 text-primary ring-1 ring-primary/25"
                 : index < step
-                  ? "bg-secondary/15 text-foreground"
-                  : "bg-secondary/8 text-muted-foreground"
+                  ? "bg-secondary/20 text-foreground"
+                  : "bg-secondary/12 text-muted-foreground"
             }`}
             onClick={() => onSelectStep(index)}
           >

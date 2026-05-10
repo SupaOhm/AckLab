@@ -31,8 +31,8 @@ export function BitGroupVisualizer({
       </div>
       <div className="grid gap-4 lg:grid-cols-4">
         {octets.map((octet, octetIndex) => (
-          <div key={`${octetIndex}-${octet}`} className="rounded-lg bg-secondary/8 p-3">
-            <p className="mb-2.5 text-xs text-muted-foreground/60">Octet {octetIndex + 1}</p>
+          <div key={`${octetIndex}-${octet}`} className="rounded-lg bg-secondary/15 p-3">
+            <p className="mb-2.5 text-xs text-muted-foreground/70">Octet {octetIndex + 1}</p>
             <div className="grid grid-cols-8 gap-1">
               {octet.split("").map((bit, localIndex) => {
                 const currentIndex = bitIndex++;
@@ -49,8 +49,8 @@ export function BitGroupVisualizer({
                       "relative grid aspect-square place-items-center rounded-md font-mono text-sm",
                       compact && "text-xs",
                       networkBit
-                        ? "bg-primary/10 text-primary ring-1 ring-primary/15"
-                        : "bg-emerald-400/8 text-emerald-300 ring-1 ring-emerald-400/12"
+                        ? "bg-primary/12 text-primary ring-1 ring-primary/20"
+                        : "bg-emerald-400/10 text-emerald-300 ring-1 ring-emerald-400/18"
                     )}
                   >
                     {bit}

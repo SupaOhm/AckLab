@@ -55,21 +55,21 @@
 .dark {
   --background: oklch(0.1 0.014 248);
   --foreground: oklch(0.94 0.01 220);
-  --card: oklch(0.135 0.016 248);
+  --card: oklch(0.155 0.016 248);
   --card-foreground: oklch(0.94 0.01 220);
-  --popover: oklch(0.125 0.016 248);
+  --popover: oklch(0.145 0.016 248);
   --popover-foreground: oklch(0.94 0.01 220);
   --primary: oklch(0.72 0.15 190);
   --primary-foreground: oklch(0.09 0.02 248);
-  --secondary: oklch(0.17 0.018 248);
+  --secondary: oklch(0.19 0.018 248);
   --secondary-foreground: oklch(0.92 0.01 220);
-  --muted: oklch(0.17 0.018 248);
-  --muted-foreground: oklch(0.58 0.02 235);
+  --muted: oklch(0.19 0.018 248);
+  --muted-foreground: oklch(0.62 0.02 235);
   --accent: oklch(0.72 0.14 155);
   --accent-foreground: oklch(0.09 0.02 248);
   --destructive: oklch(0.68 0.2 25);
-  --border: oklch(0.2 0.016 248);
-  --input: oklch(0.2 0.016 248);
+  --border: oklch(0.24 0.016 248);
+  --input: oklch(0.24 0.016 248);
   --ring: oklch(0.72 0.15 190);
 }
 
@@ -95,9 +95,9 @@ body {
 }
 
 .glass-panel {
-  background: color-mix(in oklch, var(--card) 55%, transparent);
-  border: 1px solid color-mix(in oklch, var(--border) 40%, transparent);
-  box-shadow: 0 1px 3px color-mix(in oklch, black 5%, transparent);
+  background: color-mix(in oklch, var(--card) 65%, transparent);
+  border: 1px solid color-mix(in oklch, var(--border) 55%, transparent);
+  box-shadow: 0 1px 3px color-mix(in oklch, black 8%, transparent);
   backdrop-filter: blur(16px);
 }
 

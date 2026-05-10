@@ -11,7 +11,12 @@ interface ToolWorkspaceProps {
 
 export function ToolWorkspace({ title, description, children, className }: ToolWorkspaceProps) {
   return (
-    <section className={cn("rounded-xl border border-border/20 bg-card/30 p-5 sm:p-8", className)}>
+    <section
+      className={cn(
+        "rounded-xl border border-border/40 bg-card/60 p-5 shadow-sm shadow-black/[.04] sm:p-8",
+        className
+      )}
+    >
       {title || description ? (
         <div className="mb-8 max-w-2xl">
           {title ? <h2 className="text-lg font-semibold tracking-tight">{title}</h2> : null}

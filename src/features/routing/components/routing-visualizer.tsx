@@ -80,14 +80,14 @@ export function RoutingVisualizer() {
           {/* Sidebar controls */}
           <aside className="space-y-6">
             <div className="flex flex-wrap gap-2">{controls}</div>
-            <div className="rounded-lg bg-primary/6 p-4">
+            <div className="rounded-lg bg-primary/10 p-4">
               <p className="text-sm font-medium">Lowest-cost path</p>
               <p className="mt-2 font-mono text-base text-primary">{shortest.path.join(" → ")}</p>
               <p className="mt-2 text-sm text-muted-foreground">Total cost: {shortest.cost}</p>
             </div>
             <div>
               <p className="text-sm font-medium">Selected node</p>
-              <div className="mt-2 rounded-lg bg-secondary/12 p-4">
+              <div className="mt-2 rounded-lg bg-secondary/18 p-4">
                 <div className="flex items-center justify-between gap-3">
                   <p className="font-semibold">{selected.label}</p>
                   <Badge variant="outline">{selected.type}</Badge>
@@ -143,7 +143,7 @@ function RoutingCanvas({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-xl bg-secondary/8 ${large ? "min-h-[500px]" : "min-h-[420px]"}`}
+      className={`relative overflow-hidden rounded-xl bg-secondary/15 ${large ? "min-h-[500px]" : "min-h-[420px]"}`}
     >
       <div className="network-grid absolute inset-0 opacity-10" />
       <svg className="absolute inset-0 h-full w-full" aria-hidden="true">
@@ -182,10 +182,10 @@ function RoutingCanvas({
             key={node.id}
             className={`absolute grid size-18 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-xl text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
               selectedNode === node.id
-                ? "bg-accent/10 text-accent ring-1 ring-accent/25"
+                ? "bg-accent/12 text-accent ring-1 ring-accent/30"
                 : inPath
-                  ? "bg-primary/10 text-primary ring-1 ring-primary/15"
-                  : "bg-card/70 text-foreground ring-1 ring-border/25"
+                  ? "bg-primary/12 text-primary ring-1 ring-primary/22"
+                  : "bg-card/80 text-foreground ring-1 ring-border/35"
             }`}
             style={{ left: `${node.x}%`, top: `${node.y}%` }}
             onClick={() => setSelectedNode(node.id)}

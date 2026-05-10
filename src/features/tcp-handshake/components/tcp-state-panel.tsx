@@ -38,8 +38,8 @@ export function TcpHostNode({
 
   return (
     <div className={kind === "server" ? "relative z-10 text-right" : "relative z-10"}>
-      <div className="grid size-32 place-items-center rounded-3xl border border-primary/18 bg-background/70 shadow-lg shadow-black/10 backdrop-blur">
-        <div className="grid size-16 place-items-center rounded-2xl bg-primary/12 text-primary">
+      <div className="grid size-32 place-items-center rounded-3xl border border-primary/25 bg-card/80 shadow-lg shadow-black/10 backdrop-blur">
+        <div className="grid size-16 place-items-center rounded-2xl bg-primary/15 text-primary">
           <Icon className="size-8" />
         </div>
       </div>
@@ -48,7 +48,7 @@ export function TcpHostNode({
         <p className="font-mono text-xs text-muted-foreground">{address}</p>
         <TcpStateBadge state={state} />
         {kind === "server" ? (
-          <div className="mt-3 max-w-48 rounded-xl bg-secondary/12 px-3 py-2 text-left">
+          <div className="mt-3 max-w-48 rounded-xl bg-secondary/18 px-3 py-2 text-left">
             <p className="text-[11px] text-muted-foreground">Received</p>
             <p className="mt-1 truncate font-mono text-xs">
               {receivedMessage ? `"${receivedMessage}"` : "waiting..."}
@@ -68,8 +68,8 @@ function TcpStateBadge({ state }: { state: TcpConnectionState }) {
       className={cn(
         "mt-2 inline-flex rounded-full border px-2.5 py-1 font-mono text-[11px]",
         active
-          ? "border-primary/25 bg-primary/10 text-primary"
-          : "border-border/30 bg-secondary/12 text-muted-foreground"
+          ? "border-primary/25 bg-primary/12 text-primary"
+          : "border-border/40 bg-secondary/15 text-muted-foreground"
       )}
     >
       {state}

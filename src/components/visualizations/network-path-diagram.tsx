@@ -71,12 +71,12 @@ export function NetworkPathDiagram() {
   const packetLabel = packetLabels[activeIndex];
 
   return (
-    <section className="relative min-h-[430px] overflow-hidden rounded-3xl border border-border/20 bg-card/35 p-4 shadow-2xl shadow-black/20 sm:min-h-[500px] sm:p-5">
+    <section className="relative min-h-[430px] overflow-hidden rounded-3xl border border-border/30 bg-card/45 p-4 shadow-2xl shadow-black/20 sm:min-h-[500px] sm:p-5">
       <div className="network-grid absolute inset-0 opacity-10" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_22%,hsl(var(--primary)/0.12),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--primary)/0.08),transparent_30%)]" />
 
       <div className="relative z-10 flex h-full min-h-[390px] flex-col gap-4">
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/15 bg-background/45 px-4 py-3 backdrop-blur">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/25 bg-background/55 px-4 py-3 backdrop-blur">
           <div>
             <p className="text-sm font-semibold">Live network path</p>
             <p className="mt-0.5 font-mono text-[11px] text-muted-foreground">
@@ -89,7 +89,7 @@ export function NetworkPathDiagram() {
         </div>
 
         <div className="grid flex-1 gap-4 lg:grid-cols-[1fr_178px]">
-          <div className="relative min-h-[280px] overflow-hidden rounded-2xl border border-border/10 bg-background/30">
+          <div className="relative min-h-[280px] overflow-hidden rounded-2xl border border-border/20 bg-background/40">
             <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 76" aria-hidden="true">
               <defs>
                 <marker
@@ -211,8 +211,8 @@ export function NetworkPathDiagram() {
                 >
                   <motion.span
                     className={cn(
-                      "grid size-16 place-items-center rounded-2xl border bg-background/75 text-primary shadow-lg shadow-black/10 backdrop-blur transition-colors",
-                      active ? "border-primary/35 bg-primary/12" : "border-border/20",
+                      "grid size-16 place-items-center rounded-2xl border bg-background/85 text-primary shadow-lg shadow-black/10 backdrop-blur transition-colors",
+                      active ? "border-primary/35 bg-primary/12" : "border-border/30",
                       selected && "ring-1 ring-primary/30"
                     )}
                     animate={
@@ -239,7 +239,7 @@ export function NetworkPathDiagram() {
 
           <div className="grid gap-3">
             <InfoPanel label="Current event" value={selectedNode.summary} />
-            <div className="rounded-2xl border border-border/15 bg-background/45 p-3">
+            <div className="rounded-2xl border border-border/25 bg-background/55 p-3">
               <p className="text-xs text-muted-foreground">Packet fields</p>
               <div className="mt-3 grid gap-2 font-mono text-[11px]">
                 <Field label="type" value={packetLabel} />
@@ -250,7 +250,7 @@ export function NetworkPathDiagram() {
           </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-2 rounded-2xl border border-border/15 bg-background/45 p-2">
+        <div className="grid grid-cols-4 gap-2 rounded-2xl border border-border/25 bg-background/55 p-2">
           {packetLabels.map((label, index) => (
             <button
               key={label}
@@ -276,7 +276,7 @@ export function NetworkPathDiagram() {
 
 function InfoPanel({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-border/15 bg-background/45 p-3">
+    <div className="rounded-2xl border border-border/25 bg-background/55 p-3">
       <p className="text-xs text-muted-foreground">{label}</p>
       <p className="mt-2 text-sm font-medium leading-5">{value}</p>
     </div>
@@ -285,7 +285,7 @@ function InfoPanel({ label, value }: { label: string; value: string }) {
 
 function Field({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-lg bg-secondary/12 px-2 py-1.5">
+    <div className="flex items-center justify-between gap-3 rounded-lg bg-secondary/18 px-2 py-1.5">
       <span className="text-muted-foreground">{label}</span>
       <span className="text-foreground">{value}</span>
     </div>

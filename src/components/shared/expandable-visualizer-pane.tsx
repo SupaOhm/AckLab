@@ -110,7 +110,7 @@ function VisualizerExpandDialog({
     >
       <section
         className={cn(
-          "grid max-h-[76vh] w-[min(76vw,980px,calc(100vw-40px))] gap-3 overflow-hidden rounded-2xl border border-border/25 bg-card/95 p-4 shadow-2xl shadow-primary/10 ring-1 ring-primary/10 sm:p-5",
+          "grid max-h-[76vh] w-[min(76vw,980px,calc(100vw-40px))] gap-3 overflow-hidden rounded-2xl border border-border/40 bg-card p-4 shadow-2xl shadow-primary/10 ring-1 ring-primary/10 sm:p-5",
           dialogClassName
         )}
       >

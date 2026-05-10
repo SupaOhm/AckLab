@@ -18,7 +18,7 @@ export function PlatformShell({ children }: { children: ReactNode }) {
   const setCommandOpen = useUiStore((state) => state.setCommandOpen);
 
   const sidebar = (
-    <aside className="flex h-dvh min-h-0 flex-col gap-6 border-r border-border/25 bg-background/90 p-6 backdrop-blur-xl">
+    <aside className="flex h-dvh min-h-0 flex-col gap-6 border-r border-border/40 bg-card/80 p-6 backdrop-blur-xl">
       <Link href="/" className="flex shrink-0 items-center gap-2.5 px-2 font-semibold">
         <span className="grid size-8 place-items-center rounded-lg bg-primary text-primary-foreground">
           A
@@ -29,7 +29,7 @@ export function PlatformShell({ children }: { children: ReactNode }) {
         <nav className="grid gap-8 pb-2" aria-label="Platform navigation">
           {platformNavGroups.map((group) => (
             <div key={group.label}>
-              <p className="mb-3 px-3 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground/55">
+              <p className="mb-3 px-3 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground/70">
                 {group.label}
               </p>
               <div className="grid gap-0.5">
@@ -43,12 +43,12 @@ export function PlatformShell({ children }: { children: ReactNode }) {
                       onClick={() => setMobileOpen(false)}
                       className={cn(
                         "group flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] text-muted-foreground transition-colors hover:bg-secondary/30 hover:text-foreground",
-                        active && "bg-primary/8 text-foreground"
+                        active && "bg-primary/12 text-foreground"
                       )}
                     >
                       <Icon
                         className={cn(
-                          "size-4 shrink-0 text-muted-foreground/70 transition-colors",
+                          "size-4 shrink-0 text-muted-foreground/80 transition-colors",
                           active && "text-primary"
                         )}
                       />
@@ -61,7 +61,7 @@ export function PlatformShell({ children }: { children: ReactNode }) {
           ))}
         </nav>
       </div>
-      <div className="shrink-0 rounded-lg bg-secondary/20 p-4">
+      <div className="shrink-0 rounded-lg bg-secondary/30 p-4">
         <p className="text-xs font-medium text-foreground/80">Local MVP mode</p>
         <p className="mt-1 text-xs leading-5 text-muted-foreground">
           Mock data only. Auth, payments, storage, and APIs are represented by contracts.
@@ -77,7 +77,7 @@ export function PlatformShell({ children }: { children: ReactNode }) {
         <div className="fixed inset-0 z-50 bg-background lg:hidden">{sidebar}</div>
       ) : null}
       <div className="lg:col-start-2">
-        <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border/25 bg-background/85 px-5 backdrop-blur-xl sm:px-8">
+        <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border/35 bg-background/90 px-5 backdrop-blur-xl sm:px-8">
           <div className="flex items-center gap-3">
             <Button
               aria-label="Open navigation"

@@ -99,7 +99,7 @@ export function OsiModelVisualizer() {
               {["Data", "Segment", "Packet", "Frame", "Bits"].map((unit, index) => (
                 <div
                   key={unit}
-                  className="rounded-lg bg-secondary/10 p-3"
+                  className="rounded-lg bg-secondary/16 p-3"
                   style={{ marginInline: `${index * 8}px` }}
                 >
                   <p className="text-sm font-medium">{unit}</p>
@@ -152,8 +152,8 @@ function OsiLayerStack({
           onClick={() => setSelected(layer)}
           className={`relative overflow-hidden rounded-lg p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
             selectedNumber === layer.number
-              ? "bg-primary/8 ring-1 ring-primary/15"
-              : "bg-secondary/10 hover:bg-secondary/18"
+              ? "bg-primary/10 ring-1 ring-primary/22"
+              : "bg-secondary/15 hover:bg-secondary/25"
           }`}
         >
           {packetIndex === index ? (

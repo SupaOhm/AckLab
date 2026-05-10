@@ -12,7 +12,7 @@ export function ExplanationPanel({ title, children, className }: ExplanationPane
   return (
     <section
       className={cn(
-        "rounded-xl border border-border/15 bg-secondary/12 p-6 text-sm leading-7 text-muted-foreground",
+        "rounded-xl border border-border/35 bg-secondary/18 p-6 text-sm leading-7 text-muted-foreground",
         className
       )}
     >

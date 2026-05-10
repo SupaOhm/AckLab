@@ -11,7 +11,7 @@ import type { TcpPacket } from "../lib/tcp-simulation";
 export function TcpPacketInspector({ packet }: { packet: TcpPacket | null }) {
   if (!packet) {
     return (
-      <section className="rounded-2xl border border-border/15 bg-background/45 p-4">
+      <section className="rounded-2xl border border-border/25 bg-card/55 p-4">
         <p className="text-sm font-semibold">Packet inspector</p>
         <p className="mt-2 text-xs text-muted-foreground">Packets appear after Connect.</p>
       </section>
@@ -28,7 +28,7 @@ export function TcpPacketInspector({ packet }: { packet: TcpPacket | null }) {
   ];
 
   return (
-    <section className="min-w-0 rounded-2xl border border-border/15 bg-background/45 p-4">
+    <section className="min-w-0 rounded-2xl border border-border/25 bg-card/55 p-4">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-semibold">Packet inspector</p>
         <span className="rounded-full bg-primary/10 px-2.5 py-1 font-mono text-[11px] text-primary">
@@ -37,7 +37,7 @@ export function TcpPacketInspector({ packet }: { packet: TcpPacket | null }) {
       </div>
       <div className="mt-4 grid grid-cols-2 gap-2">
         {fields.map(([label, value]) => (
-          <div key={label} className="min-w-0 rounded-lg bg-secondary/12 px-2.5 py-2">
+          <div key={label} className="min-w-0 rounded-lg bg-secondary/18 px-2.5 py-2">
             <p className="text-[11px] text-muted-foreground">{label}</p>
             <p className="mt-1 break-all font-mono text-xs">{value}</p>
           </div>
@@ -67,7 +67,7 @@ export function TcpTimeline({
   }, [events.length]);
 
   return (
-    <section className="min-w-0 rounded-2xl border border-border/15 bg-background/45 p-4">
+    <section className="min-w-0 rounded-2xl border border-border/25 bg-card/55 p-4">
       <div className="flex items-center justify-between gap-4">
         <p className="text-sm font-semibold">Timeline</p>
         <span className="text-xs text-muted-foreground">{events.length} packets</span>
@@ -87,8 +87,8 @@ export function TcpTimeline({
                   <button
                     type="button"
                     className={cn(
-                      "min-w-24 rounded-xl border border-border/10 bg-secondary/10 px-3 py-2 text-left transition hover:border-primary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                      active && "border-primary/30 bg-primary/10"
+                      "min-w-24 rounded-xl border border-border/20 bg-secondary/15 px-3 py-2 text-left transition hover:border-primary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      active && "border-primary/30 bg-primary/12"
                     )}
                     onClick={() => event.packetId && onSelectPacket(event.packetId)}
                   >

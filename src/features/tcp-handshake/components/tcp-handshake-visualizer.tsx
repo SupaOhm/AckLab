@@ -88,7 +88,7 @@ export function TcpHandshakeVisualizer() {
         description="Control the client. Watch connection state, packets, and acknowledgements change."
       >
         <div className="grid min-w-0 gap-5">
-          <section className="flex min-w-0 flex-col gap-3 rounded-2xl border border-border/15 bg-background/35 p-3 lg:flex-row lg:items-end">
+          <section className="flex min-w-0 flex-col gap-3 rounded-2xl border border-border/25 bg-card/50 p-3 lg:flex-row lg:items-end">
             <div className="grid min-w-0 flex-1 gap-2">
               <Label htmlFor="tcp-message">Message</Label>
               <Input
@@ -180,7 +180,7 @@ function TcpCanvas({
   staticPacket?: boolean;
 }) {
   return (
-    <section className="relative min-w-0 overflow-hidden rounded-3xl border border-border/15 bg-card/25 p-3 shadow-xl shadow-black/10 sm:p-6">
+    <section className="relative min-w-0 overflow-hidden rounded-3xl border border-border/25 bg-card/40 p-3 shadow-xl shadow-black/10 sm:p-6">
       <div className="network-grid absolute inset-0 opacity-10" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_35%,hsl(var(--primary)/0.08),transparent_32%),radial-gradient(circle_at_82%_45%,hsl(var(--primary)/0.08),transparent_30%)]" />
       <div className="relative z-10 grid min-h-[500px] min-w-0 grid-rows-[auto_1fr_auto] gap-4 sm:gap-5">
@@ -191,7 +191,7 @@ function TcpCanvas({
             <span>server seq {sequence.server}</span>
           </div>
         </div>
-        <div className="relative min-w-0 overflow-hidden rounded-2xl border border-border/10 bg-background/35 p-3 sm:p-5">
+        <div className="relative min-w-0 overflow-hidden rounded-2xl border border-border/20 bg-background/45 p-3 sm:p-5">
           <div className="absolute left-[17%] right-[17%] top-1/2 h-px bg-border/45" />
           <div className="absolute left-[17%] right-[17%] top-[calc(50%-20px)] h-10 rounded-full bg-primary/5" />
           <div className="relative flex min-h-[320px] min-w-0 items-center justify-between gap-4">
