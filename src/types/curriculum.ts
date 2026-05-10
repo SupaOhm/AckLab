@@ -1,6 +1,7 @@
 export type CurriculumDifficulty = "beginner" | "intermediate" | "advanced";
 
 export type CurriculumStatus = "unlocked" | "locked" | "comingSoon";
+export type CurriculumAvailability = "available" | "completed" | "locked" | "comingSoon";
 
 export type CurriculumModuleType = "concept" | "lab" | "tool" | "protocol" | "path";
 

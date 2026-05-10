@@ -1,21 +1,46 @@
-import { LockKeyhole, Sparkles } from "lucide-react";
+import { CheckCircle2, Clock3, LockKeyhole, Sparkles } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import type { CurriculumStatus } from "@/types/curriculum";
+import type { CurriculumAvailability, CurriculumStatus } from "@/types/curriculum";
 
-export function StatusBadge({ status }: { status: CurriculumStatus }) {
-  if (status === "unlocked") {
+interface StatusBadgeProps {
+  status?: CurriculumStatus;
+  availability?: CurriculumAvailability;
+}
+
+export function StatusBadge({ status, availability }: StatusBadgeProps) {
+  const resolved = availability ?? (status === "unlocked" ? "available" : "comingSoon");
+
+  if (resolved === "completed") {
+    return (
+      <Badge variant="success" className="gap-1.5">
+        <CheckCircle2 className="size-3" />
+        Completed
+      </Badge>
+    );
+  }
+
+  if (resolved === "available") {
     return (
       <Badge variant="success" className="gap-1.5">
         <Sparkles className="size-3" />
-        Unlocked
+        Available
+      </Badge>
+    );
+  }
+
+  if (resolved === "locked") {
+    return (
+      <Badge variant="outline" className="gap-1.5 text-muted-foreground">
+        <LockKeyhole className="size-3" />
+        Locked
       </Badge>
     );
   }
 
   return (
     <Badge variant="outline" className="gap-1.5 text-muted-foreground">
-      <LockKeyhole className="size-3" />
+      <Clock3 className="size-3" />
       Coming soon
     </Badge>
   );

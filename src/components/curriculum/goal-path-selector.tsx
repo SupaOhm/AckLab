@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getModules } from "@/data/curriculum";
+import { getCurriculumAvailability, isModuleAvailable } from "@/lib/curriculum-status";
 import type { LearningPath } from "@/types/curriculum";
 
 export function GoalPathSelector({ paths }: { paths: LearningPath[] }) {
@@ -19,7 +20,7 @@ export function GoalPathSelector({ paths }: { paths: LearningPath[] }) {
       <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {paths.map((path) => {
           const modules = getModules(path.moduleIds);
-          const first = modules.find((module) => module.status === "unlocked") ?? modules[0];
+          const first = modules.find((module) => isModuleAvailable(module)) ?? modules[0];
 
           return (
             <article key={path.id} className="rounded-xl border border-border/20 bg-card/25 p-5">
@@ -31,7 +32,9 @@ export function GoalPathSelector({ paths }: { paths: LearningPath[] }) {
                 {modules.slice(0, 4).map((module) => (
                   <Badge
                     key={module.id}
-                    variant={module.status === "unlocked" ? "default" : "outline"}
+                    variant={
+                      getCurriculumAvailability(module) === "available" ? "default" : "outline"
+                    }
                   >
                     {module.title}
                   </Badge>

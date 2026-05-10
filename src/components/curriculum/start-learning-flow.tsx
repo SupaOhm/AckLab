@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getModules } from "@/data/curriculum";
 import { useLearningProgress } from "@/hooks/use-learning-progress";
+import { getCurriculumAvailability, isModuleAvailable } from "@/lib/curriculum-status";
 import { cn } from "@/lib/utils";
 
 const startModuleIds = ["binary-converter", "subnet-visualizer", "routing-basics"];
@@ -16,13 +17,13 @@ const startModuleIds = ["binary-converter", "subnet-visualizer", "routing-basics
 export function StartLearningFlow() {
   const modules = getModules(startModuleIds);
   const { hydrated, isCompleted, toggleCompleted } = useLearningProgress();
-  const unlockedModules = modules.filter((module) => module.status === "unlocked");
+  const unlockedModules = modules.filter((module) => isModuleAvailable(module));
   const completedCount = unlockedModules.filter((module) => isCompleted(module.id)).length;
   const progressPercent =
     unlockedModules.length > 0 ? Math.round((completedCount / unlockedModules.length) * 100) : 0;
   const nextModule =
     unlockedModules.find((module) => !isCompleted(module.id)) ??
-    modules.find((module) => module.status !== "unlocked");
+    modules.find((module) => !isModuleAvailable(module));
 
   return (
     <div className="grid gap-6">
@@ -64,8 +65,9 @@ export function StartLearningFlow() {
 
       <div className="grid gap-4">
         {modules.map((module, index) => {
-          const unlocked = module.status === "unlocked";
+          const unlocked = isModuleAvailable(module);
           const completed = hydrated && isCompleted(module.id);
+          const availability = getCurriculumAvailability(module, completed);
           const current = unlocked && !completed;
 
           return (
@@ -101,7 +103,7 @@ export function StartLearningFlow() {
 
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <StatusBadge status={module.status} />
+                    <StatusBadge availability={availability} />
                     {completed ? (
                       <Badge variant="success">Done</Badge>
                     ) : current ? (
@@ -134,7 +136,7 @@ export function StartLearningFlow() {
                     <Button asChild variant="outline">
                       <Link href={(module.route ?? `/learn/${module.id}`) as Route}>
                         <LockKeyhole className="size-4" />
-                        Coming soon
+                        {availability === "locked" ? "Preview module" : "Coming soon"}
                       </Link>
                     </Button>
                   )}

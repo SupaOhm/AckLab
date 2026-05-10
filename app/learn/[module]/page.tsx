@@ -15,6 +15,7 @@ import {
   getModules,
   getUnlockedModules
 } from "@/data/curriculum";
+import { getCurriculumAvailability } from "@/lib/curriculum-status";
 
 interface ModulePageProps {
   params: Promise<{
@@ -56,6 +57,8 @@ export default async function ModulePage({ params }: ModulePageProps) {
   );
   const fallbackLabs = getUnlockedModules().slice(0, 3);
   const suggested = related.length > 0 ? related : fallbackLabs;
+  const availability = getCurriculumAvailability(currentModule);
+  const isPlannedLab = availability === "comingSoon";
 
   return (
     <PlatformShell>
@@ -68,7 +71,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
       <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
         <section className="rounded-xl border border-border/20 bg-card/25 p-6">
           <div className="flex flex-wrap items-center gap-3">
-            <StatusBadge status={currentModule.status} />
+            <StatusBadge availability={availability} />
             <Badge variant="secondary">{currentModule.difficulty}</Badge>
             <Badge variant="outline">{currentModule.estimatedTime}</Badge>
             {currentModule.osiLayer ? (
@@ -79,10 +82,13 @@ export default async function ModulePage({ params }: ModulePageProps) {
           <div className="mt-10 grid min-h-64 place-items-center rounded-xl border border-dashed border-border/30 bg-secondary/10 p-8 text-center">
             <div className="max-w-md">
               <LockKeyhole className="mx-auto size-10 text-primary/70" />
-              <h2 className="mt-5 text-xl font-semibold">Coming soon</h2>
+              <h2 className="mt-5 text-xl font-semibold">
+                {isPlannedLab ? "Coming soon" : "Locked for now"}
+              </h2>
               <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                This module is part of the Network Fundamentals Map, but its interactive lab is not
-                built yet.
+                {isPlannedLab
+                  ? "This interactive lab is part of the Network Fundamentals Map, but it is not built yet."
+                  : "This concept is visible in the learning map now. Its full lesson flow is still being assembled."}
               </p>
               <Button asChild className="mt-6" variant="outline">
                 <Link href="/learn">

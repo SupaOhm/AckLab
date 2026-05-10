@@ -6,11 +6,12 @@ import { ModuleCard } from "@/components/curriculum/module-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getModules } from "@/data/curriculum";
+import { isModuleAvailable } from "@/lib/curriculum-status";
 import type { LearningPath } from "@/types/curriculum";
 
 export function LearningPathCard({ path }: { path: LearningPath }) {
   const modules = getModules(path.moduleIds);
-  const firstUnlocked = modules.find((module) => module.status === "unlocked");
+  const firstUnlocked = modules.find((module) => isModuleAvailable(module));
 
   return (
     <section className="rounded-xl border border-border/20 bg-card/25 p-5">

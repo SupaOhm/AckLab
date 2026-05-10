@@ -8,6 +8,7 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { beginnerPath, getModules, goalPaths, labModuleIds } from "@/data/curriculum";
+import { getCurriculumAvailability } from "@/lib/curriculum-status";
 import { cn } from "@/lib/utils";
 import type { LearningPath } from "@/types/curriculum";
 
@@ -122,7 +123,10 @@ export function BeginnerOnboardingCard() {
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           {modules.map((module) => (
-            <Badge key={module.id} variant={module.status === "unlocked" ? "default" : "outline"}>
+            <Badge
+              key={module.id}
+              variant={getCurriculumAvailability(module) === "available" ? "default" : "outline"}
+            >
               {module.title}
             </Badge>
           ))}
