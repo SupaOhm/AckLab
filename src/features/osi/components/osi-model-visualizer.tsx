@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Play, RotateCcw } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { ExpandableVisualizerPane } from "@/components/shared/expandable-visualizer-pane";
 import { ExplanationPanel } from "@/components/shared/explanation-panel";
 import { PracticePrompt } from "@/components/shared/practice-prompt";
 import { ToolWorkspace } from "@/components/shared/tool-workspace";
@@ -15,6 +16,25 @@ export function OsiModelVisualizer() {
   const [selected, setSelected] = useState(osiLayers[0]);
   const [packetIndex, setPacketIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const controls = (
+    <>
+      <Button size="sm" onClick={() => setPlaying(true)}>
+        <Play className="size-4" />
+        Traverse
+      </Button>
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={() => {
+          setPlaying(false);
+          setPacketIndex(0);
+        }}
+      >
+        <RotateCcw className="size-4" />
+        Reset
+      </Button>
+    </>
+  );
 
   useEffect(() => {
     if (!playing) {
@@ -46,55 +66,27 @@ export function OsiModelVisualizer() {
           <section className="space-y-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="text-sm font-semibold">OSI layers</h2>
-              <div className="flex gap-2">
-                <Button size="sm" onClick={() => setPlaying(true)}>
-                  <Play className="size-4" />
-                  Traverse
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    setPlaying(false);
-                    setPacketIndex(0);
-                  }}
-                >
-                  <RotateCcw className="size-4" />
-                  Reset
-                </Button>
-              </div>
+              <div className="flex gap-2">{controls}</div>
             </div>
-            <div className="relative grid gap-1.5">
-              {osiLayers.map((layer, index) => (
-                <button
-                  key={layer.number}
-                  onClick={() => setSelected(layer)}
-                  className={`relative overflow-hidden rounded-lg p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                    selected.number === layer.number
-                      ? "bg-primary/8 ring-1 ring-primary/15"
-                      : "bg-secondary/10 hover:bg-secondary/18"
-                  }`}
-                >
-                  {packetIndex === index ? (
-                    <motion.div
-                      layoutId="osi-packet"
-                      className="absolute right-4 top-1/2 h-4 w-14 -translate-y-1/2 rounded-full bg-accent/80"
-                    />
-                  ) : null}
-                  <div className="relative z-10 flex items-center justify-between gap-4">
-                    <div>
-                      <p className="text-sm font-semibold">
-                        {layer.number}. {layer.name}
-                      </p>
-                      <p className="mt-1 max-w-xl text-sm leading-7 text-muted-foreground">
-                        {layer.summary}
-                      </p>
-                    </div>
-                    <Badge variant="outline">{layer.dataUnit}</Badge>
-                  </div>
-                </button>
-              ))}
-            </div>
+            <ExpandableVisualizerPane
+              title={`${selected.name} layer`}
+              description={selected.summary}
+              controls={controls}
+              expandedChildren={() => (
+                <OsiLayerStack
+                  packetIndex={packetIndex}
+                  selectedNumber={selected.number}
+                  setSelected={setSelected}
+                  large
+                />
+              )}
+            >
+              <OsiLayerStack
+                packetIndex={packetIndex}
+                selectedNumber={selected.number}
+                setSelected={setSelected}
+              />
+            </ExpandableVisualizerPane>
           </section>
 
           {/* Encapsulation view */}
@@ -137,6 +129,52 @@ export function OsiModelVisualizer() {
         </ExplanationPanel>
         <PracticePrompt prompt="Click Transport, Network, and Data Link. Which layer uses ports, which layer uses IP addresses, and which layer uses frames?" />
       </div>
+    </div>
+  );
+}
+
+function OsiLayerStack({
+  packetIndex,
+  selectedNumber,
+  setSelected,
+  large = false
+}: {
+  packetIndex: number;
+  selectedNumber: number;
+  setSelected: (layer: (typeof osiLayers)[number]) => void;
+  large?: boolean;
+}) {
+  return (
+    <div className={`relative grid gap-1.5 ${large ? "min-h-[500px] content-center" : ""}`}>
+      {osiLayers.map((layer, index) => (
+        <button
+          key={layer.number}
+          onClick={() => setSelected(layer)}
+          className={`relative overflow-hidden rounded-lg p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+            selectedNumber === layer.number
+              ? "bg-primary/8 ring-1 ring-primary/15"
+              : "bg-secondary/10 hover:bg-secondary/18"
+          }`}
+        >
+          {packetIndex === index ? (
+            <motion.div
+              layoutId="osi-packet"
+              className="absolute right-4 top-1/2 h-4 w-14 -translate-y-1/2 rounded-full bg-accent/80"
+            />
+          ) : null}
+          <div className="relative z-10 flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold">
+                {layer.number}. {layer.name}
+              </p>
+              <p className="mt-1 max-w-xl text-sm leading-7 text-muted-foreground">
+                {layer.summary}
+              </p>
+            </div>
+            <Badge variant="outline">{layer.dataUnit}</Badge>
+          </div>
+        </button>
+      ))}
     </div>
   );
 }

@@ -1,11 +1,10 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { Cpu, Maximize2, Monitor, Radio, Server } from "lucide-react";
+import { Cpu, Monitor, Radio, Server } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { ArpFrame, ArpHost, ArpStep } from "@/features/arp/types";
 
@@ -25,7 +24,6 @@ export function ArpTopology({
   step,
   className,
   maxScale = 1.06,
-  onExpand,
   staticFrame = false
 }: {
   frame: ArpFrame | null;
@@ -33,7 +31,6 @@ export function ArpTopology({
   step: ArpStep;
   className?: string;
   maxScale?: number;
-  onExpand?: () => void;
   staticFrame?: boolean;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -163,18 +160,6 @@ export function ArpTopology({
           ) : null}
         </div>
       </div>
-      {onExpand ? (
-        <Button
-          type="button"
-          size="icon"
-          variant="outline"
-          className="absolute bottom-3 right-3 z-20 bg-background/75 shadow-lg shadow-black/20 backdrop-blur"
-          onClick={onExpand}
-          aria-label="Expand topology"
-        >
-          <Maximize2 className="size-4" />
-        </Button>
-      ) : null}
     </section>
   );
 }
