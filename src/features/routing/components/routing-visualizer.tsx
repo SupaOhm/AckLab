@@ -47,11 +47,12 @@ export function RoutingVisualizer() {
         title="Routing workspace"
         description="The highlighted route is the lowest-cost known path from the source to the destination."
       >
-        <div className="grid gap-8 xl:grid-cols-[1fr_300px]">
+        <div className="grid min-w-0 gap-8 xl:grid-cols-[minmax(0,1fr)_300px]">
           <ExpandableVisualizerPane
             title="Routing path"
             description={`Lowest-cost path: ${shortest.path.join(" -> ")}. Total cost: ${shortest.cost}.`}
             controls={controls}
+            size="wide"
             expandedChildren={({ staticOnOpen }) => (
               <RoutingCanvas
                 packetKey={packetKey}

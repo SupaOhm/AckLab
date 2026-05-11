@@ -19,6 +19,9 @@ interface ExpandableVisualizerPaneProps {
   expandedChildren: (state: ExpandedRenderState) => ReactNode;
   className?: string;
   dialogClassName?: string;
+  bodyClassName?: string;
+  triggerClassName?: string;
+  size?: "default" | "wide";
 }
 
 export function ExpandableVisualizerPane({
@@ -28,7 +31,10 @@ export function ExpandableVisualizerPane({
   controls,
   expandedChildren,
   className,
-  dialogClassName
+  dialogClassName,
+  bodyClassName,
+  triggerClassName,
+  size = "default"
 }: ExpandableVisualizerPaneProps) {
   const [open, setOpen] = useState(false);
 
@@ -56,7 +62,10 @@ export function ExpandableVisualizerPane({
           type="button"
           size="icon"
           variant="outline"
-          className="absolute bottom-3 right-3 z-20 bg-background/75 shadow-lg shadow-black/20 backdrop-blur"
+          className={cn(
+            "absolute bottom-3 right-3 z-20 bg-background/75 shadow-lg shadow-black/20 backdrop-blur",
+            triggerClassName
+          )}
           onClick={() => setOpen(true)}
           aria-label="Expand visualizer"
         >
@@ -69,6 +78,8 @@ export function ExpandableVisualizerPane({
           description={description}
           controls={controls}
           dialogClassName={dialogClassName}
+          bodyClassName={bodyClassName}
+          size={size}
           onClose={() => setOpen(false)}
         >
           {(state) => expandedChildren(state)}
@@ -84,6 +95,8 @@ function VisualizerExpandDialog({
   description,
   controls,
   dialogClassName,
+  bodyClassName,
+  size,
   onClose
 }: {
   children: (state: ExpandedRenderState) => ReactNode;
@@ -91,6 +104,8 @@ function VisualizerExpandDialog({
   description?: string;
   controls?: ReactNode;
   dialogClassName?: string;
+  bodyClassName?: string;
+  size: "default" | "wide";
   onClose: () => void;
 }) {
   const [staticOnOpen, setStaticOnOpen] = useState(true);
@@ -101,20 +116,26 @@ function VisualizerExpandDialog({
     return () => window.cancelAnimationFrame(frame);
   }, []);
 
+  const widthClass =
+    size === "wide"
+      ? "w-[calc(100vw-32px)] lg:w-[min(92vw,1200px)]"
+      : "w-[calc(100vw-32px)] lg:w-[min(76vw,980px)]";
+
   return (
     <div
-      className="fixed inset-0 z-50 grid place-items-center bg-black/35 p-5 backdrop-blur-[2px]"
+      className="fixed inset-0 z-50 grid place-items-center bg-black/35 p-4 backdrop-blur-[2px] sm:p-5"
       role="dialog"
       aria-modal="true"
       aria-labelledby="visualizer-expand-title"
     >
       <section
         className={cn(
-          "grid max-h-[76vh] w-[min(76vw,980px,calc(100vw-40px))] gap-3 overflow-hidden rounded-2xl border border-border/40 bg-card p-4 shadow-2xl shadow-primary/10 ring-1 ring-primary/10 sm:p-5",
+          "grid max-h-[min(82vh,760px)] grid-rows-[auto_minmax(0,1fr)] gap-3 overflow-hidden rounded-2xl border border-border/40 bg-card p-4 shadow-2xl shadow-primary/10 ring-1 ring-primary/10 sm:p-5",
+          widthClass,
           dialogClassName
         )}
       >
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
           <div className="min-w-0">
             <h2 id="visualizer-expand-title" className="text-lg font-semibold tracking-tight">
               {title}
@@ -125,14 +146,16 @@ function VisualizerExpandDialog({
               </p>
             ) : null}
           </div>
-          <div className="flex shrink-0 flex-wrap justify-end gap-2">
+          <div className="flex shrink-0 flex-wrap gap-2 sm:justify-end">
             {controls}
             <Button size="sm" variant="ghost" onClick={onClose} aria-label="Close expanded view">
               <X className="size-4" />
             </Button>
           </div>
         </div>
-        {children({ staticOnOpen })}
+        <div className={cn("min-h-0 overflow-y-auto overscroll-contain pr-1", bodyClassName)}>
+          {children({ staticOnOpen })}
+        </div>
       </section>
     </div>
   );

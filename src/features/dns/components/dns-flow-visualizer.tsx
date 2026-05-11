@@ -64,16 +64,30 @@ export function DnsFlowVisualizer() {
         title="Recursive DNS lookup"
         description="Follow the question from your browser to the server that can answer it."
       >
-        <div className="grid gap-8 xl:grid-cols-[1fr_340px]">
+        <div className="grid min-w-0 gap-8 xl:grid-cols-[minmax(0,1fr)_340px]">
           <ExpandableVisualizerPane
             title={active.title}
             description={active.description}
             controls={controls}
             expandedChildren={({ staticOnOpen }) => (
-              <DnsCanvas step={step} onSelectStep={setStep} staticOnOpen={staticOnOpen} large />
+              <DnsCanvas
+                step={step}
+                onSelectStep={(index) => {
+                  setPlaying(false);
+                  setStep(index);
+                }}
+                staticOnOpen={staticOnOpen}
+                large
+              />
             )}
           >
-            <DnsCanvas step={step} onSelectStep={setStep} />
+            <DnsCanvas
+              step={step}
+              onSelectStep={(index) => {
+                setPlaying(false);
+                setStep(index);
+              }}
+            />
           </ExpandableVisualizerPane>
 
           {/* Controls + step timeline */}

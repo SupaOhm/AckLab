@@ -110,6 +110,8 @@ export function TcpHandshakeVisualizer() {
                 : "Open a simulated TCP connection and inspect state changes."
             }
             controls={controls}
+            size="wide"
+            className="min-w-0 pb-14"
             expandedChildren={({ staticOnOpen }) => (
               <TcpCanvas
                 activePacket={activePacket}

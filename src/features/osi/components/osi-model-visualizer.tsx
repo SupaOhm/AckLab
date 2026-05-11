@@ -61,7 +61,7 @@ export function OsiModelVisualizer() {
         title="Layer stack"
         description="Click a layer to see what it adds to the data. Traverse shows a packet moving down the stack."
       >
-        <div className="grid gap-8 xl:grid-cols-[1fr_340px]">
+        <div className="grid min-w-0 gap-8 xl:grid-cols-[minmax(0,1fr)_340px]">
           {/* Layer list */}
           <section className="space-y-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -72,6 +72,8 @@ export function OsiModelVisualizer() {
               title={`${selected.name} layer`}
               description={selected.summary}
               controls={controls}
+              bodyClassName="pb-1"
+              className="pb-14"
               expandedChildren={() => (
                 <OsiLayerStack
                   packetIndex={packetIndex}
@@ -145,7 +147,7 @@ function OsiLayerStack({
   large?: boolean;
 }) {
   return (
-    <div className={`relative grid gap-1.5 ${large ? "min-h-[500px] content-center" : ""}`}>
+    <div className={`relative grid min-w-0 gap-1.5 ${large ? "content-start" : ""}`}>
       {osiLayers.map((layer, index) => (
         <button
           key={layer.number}
