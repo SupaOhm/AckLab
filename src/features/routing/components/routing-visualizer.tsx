@@ -1,42 +1,133 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Play, RotateCcw } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { ExpandableVisualizerPane } from "@/components/shared/expandable-visualizer-pane";
-import { ExplanationPanel } from "@/components/shared/explanation-panel";
 import { PracticePrompt } from "@/components/shared/practice-prompt";
 import { ToolWorkspace } from "@/components/shared/tool-workspace";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { routingEdges, routingNodes } from "@/data/routing";
-import { findShortestPath, isPathEdge } from "@/features/routing/lib/routing-utils";
+import { initialRoutingLinks, initialRoutingNodes } from "@/features/routing/data/routing-topology";
+import { findRouteCandidates } from "@/features/routing/lib/path-candidates";
+import { findShortestPath } from "@/features/routing/lib/shortest-path";
+
+import { RouteComparisonPanel } from "./route-comparison-panel";
+import { RoutingChallengePanel } from "./routing-challenge-panel";
+import { RoutingControlPanel } from "./routing-control-panel";
+import { RoutingExplanationPanel } from "./routing-explanation-panel";
+import { RoutingGraph } from "./routing-graph";
+import { RoutingScenarioPresets, type RoutingScenarioId } from "./routing-scenario-presets";
+import { RoutingWorkflowPanel } from "./routing-workflow-panel";
+import type { RouteChangeRecord, RoutingLabLink, RoutingSelection } from "../types";
 
 export function RoutingVisualizer() {
-  const [selectedNode, setSelectedNode] = useState("client");
+  const [links, setLinks] = useState(() => initialRoutingLinks.map((link) => ({ ...link })));
+  const [sourceId, setSourceId] = useState("client");
+  const [destinationId, setDestinationId] = useState("server");
+  const [selected, setSelected] = useState<RoutingSelection>({ type: "node", id: "client" });
   const [packetKey, setPacketKey] = useState(0);
-  const shortest = useMemo(
-    () => findShortestPath(routingNodes, routingEdges, "client", "server"),
-    []
-  );
+  const [recomputeCount, setRecomputeCount] = useState(0);
+  const [changeRecord, setChangeRecord] = useState<RouteChangeRecord | null>(null);
 
-  const selected = routingNodes.find((node) => node.id === selectedNode) ?? routingNodes[0];
-  const pathPositions = shortest.path
-    .map((id) => routingNodes.find((node) => node.id === id))
-    .filter(Boolean)
-    .map((node) => ({ left: `${node!.x}%`, top: `${node!.y}%` }));
-  const packetLeft = pathPositions.map((position) => position.left);
-  const packetTop = pathPositions.map((position) => position.top);
+  const route = useMemo(
+    () => findShortestPath(initialRoutingNodes, links, sourceId, destinationId),
+    [destinationId, links, sourceId]
+  );
+  const candidates = useMemo(
+    () =>
+      findRouteCandidates({
+        destinationId,
+        links,
+        nodes: initialRoutingNodes,
+        selectedPath: route.path,
+        sourceId
+      }),
+    [destinationId, links, route.path, sourceId]
+  );
+  const source = nodeById(sourceId);
+  const destination = nodeById(destinationId);
+  const primaryAlternative = candidates.find((candidate) => candidate.status === "alternative");
+  const workflowStep = recomputeCount > 0 ? 4 : selected?.type === "link" ? 2 : 1;
+
+  function markRouteChanged(label: string) {
+    setChangeRecord({ label, previousRoute: route });
+    setRecomputeCount((count) => count + 1);
+    setPacketKey(0);
+  }
+
+  function updateSource(nodeId: string) {
+    if (nodeId === destinationId) {
+      return;
+    }
+    setSourceId(nodeId);
+    setSelected({ type: "node", id: nodeId });
+    markRouteChanged(`Source changed to ${nodeById(nodeId).label}`);
+  }
+
+  function updateDestination(nodeId: string) {
+    if (nodeId === sourceId) {
+      return;
+    }
+    setDestinationId(nodeId);
+    setSelected({ type: "node", id: nodeId });
+    markRouteChanged(`Destination changed to ${nodeById(nodeId).label}`);
+  }
+
+  function updateLinkCost(linkId: string, cost: number) {
+    const link = links.find((item) => item.id === linkId);
+
+    if (!link || link.cost === cost) {
+      return;
+    }
+
+    setLinks((current) => current.map((link) => (link.id === linkId ? { ...link, cost } : link)));
+    setSelected({ type: "link", id: linkId });
+    markRouteChanged(`${linkLabel(link)} cost changed from ${link.cost} to ${cost}`);
+  }
+
+  function toggleLink(linkId: string) {
+    const link = links.find((item) => item.id === linkId);
+
+    if (!link) {
+      return;
+    }
+
+    setLinks((current) =>
+      current.map((link) => (link.id === linkId ? { ...link, disabled: !link.disabled } : link))
+    );
+    setSelected({ type: "link", id: linkId });
+    markRouteChanged(`${linkLabel(link)} ${link.disabled ? "enabled" : "disabled"}`);
+  }
+
+  function resetTopology() {
+    setLinks(initialRoutingLinks.map((link) => ({ ...link })));
+    setSourceId("client");
+    setDestinationId("server");
+    setSelected({ type: "node", id: "client" });
+    setPacketKey(0);
+    setRecomputeCount(0);
+    setChangeRecord(null);
+  }
+
+  function applyScenario(scenario: RoutingScenarioId) {
+    const nextLinks = scenarioLinks(scenario);
+
+    setLinks(nextLinks);
+    setSourceId("client");
+    setDestinationId("server");
+    setSelected({ type: "node", id: "client" });
+    markRouteChanged(scenarioLabel(scenario));
+  }
+
   const controls = (
     <>
-      <Button size="sm" onClick={() => setPacketKey((key) => key + 1)}>
+      <Button size="sm" onClick={() => setPacketKey((key) => key + 1)} disabled={!route.reachable}>
         <Play className="size-4" />
         Send packet
       </Button>
-      <Button size="sm" variant="outline" onClick={() => setPacketKey((key) => key + 1)}>
+      <Button size="sm" variant="outline" onClick={resetTopology}>
         <RotateCcw className="size-4" />
-        Replay
+        Reset
       </Button>
     </>
   );
@@ -44,164 +135,156 @@ export function RoutingVisualizer() {
   return (
     <div className="grid gap-10">
       <ToolWorkspace
-        title="Routing workspace"
-        description="The highlighted route is the lowest-cost known path from the source to the destination."
+        title="Routing lab"
+        description="Change link costs or fail a link. The lab recomputes the lowest-cost route."
       >
-        <div className="grid min-w-0 gap-8 xl:grid-cols-[minmax(0,1fr)_300px]">
-          <ExpandableVisualizerPane
-            title="Routing path"
-            description={`Lowest-cost path: ${shortest.path.join(" -> ")}. Total cost: ${shortest.cost}.`}
-            controls={controls}
-            size="wide"
-            expandedChildren={({ staticOnOpen }) => (
-              <RoutingCanvas
-                packetKey={packetKey}
-                packetLeft={packetLeft}
-                packetTop={packetTop}
-                pathPositions={pathPositions}
-                selectedNode={selectedNode}
-                setSelectedNode={setSelectedNode}
-                shortestPath={shortest.path}
-                staticOnOpen={staticOnOpen}
-                large
-              />
-            )}
-          >
-            <RoutingCanvas
-              packetKey={packetKey}
-              packetLeft={packetLeft}
-              packetTop={packetTop}
-              pathPositions={pathPositions}
-              selectedNode={selectedNode}
-              setSelectedNode={setSelectedNode}
-              shortestPath={shortest.path}
-            />
-          </ExpandableVisualizerPane>
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/15 bg-background/40 p-3">
+          <div>
+            <p className="text-sm font-semibold">
+              {source.label} to {destination.label}
+            </p>
+            <p className="mt-1 font-mono text-xs text-muted-foreground">
+              {route.reachable
+                ? `${route.path.map((id) => nodeById(id).label).join(" -> ")} · cost ${route.cost}`
+                : "no route"}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">{controls}</div>
+        </div>
 
-          {/* Sidebar controls */}
-          <aside className="space-y-6">
-            <div className="flex flex-wrap gap-2">{controls}</div>
-            <div className="rounded-lg bg-primary/10 p-4">
-              <p className="text-sm font-medium">Lowest-cost path</p>
-              <p className="mt-2 font-mono text-base text-primary">{shortest.path.join(" → ")}</p>
-              <p className="mt-2 text-sm text-muted-foreground">Total cost: {shortest.cost}</p>
+        <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="grid min-w-0 gap-4">
+            <ExpandableVisualizerPane
+              title="Routing topology"
+              description={
+                route.reachable
+                  ? `Selected path cost: ${route.cost}. Disable links or edit costs to force a new route.`
+                  : "No enabled path connects the selected endpoints."
+              }
+              controls={controls}
+              size="wide"
+              expandedChildren={({ staticOnOpen }) => (
+                <RoutingGraph
+                  links={links}
+                  nodes={initialRoutingNodes}
+                  packetKey={packetKey}
+                  route={route}
+                  selected={selected}
+                  destinationId={destinationId}
+                  sourceId={sourceId}
+                  onSelectLink={(linkId) => setSelected({ type: "link", id: linkId })}
+                  onSelectNode={(nodeId) => setSelected({ type: "node", id: nodeId })}
+                  staticOnOpen={staticOnOpen}
+                  large
+                />
+              )}
+            >
+              <RoutingGraph
+                links={links}
+                nodes={initialRoutingNodes}
+                packetKey={packetKey}
+                route={route}
+                selected={selected}
+                destinationId={destinationId}
+                sourceId={sourceId}
+                onSelectLink={(linkId) => setSelected({ type: "link", id: linkId })}
+                onSelectNode={(nodeId) => setSelected({ type: "node", id: nodeId })}
+              />
+            </ExpandableVisualizerPane>
+
+            <div className="grid gap-4 2xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+              <RoutingExplanationPanel
+                destination={destination}
+                links={links}
+                nodes={initialRoutingNodes}
+                primaryAlternative={primaryAlternative}
+                recomputeCount={recomputeCount}
+                route={route}
+                selected={selected}
+                source={source}
+              />
+              <RouteComparisonPanel
+                candidates={candidates}
+                changeRecord={changeRecord}
+                currentRoute={route}
+                nodes={initialRoutingNodes}
+              />
             </div>
-            <div>
-              <p className="text-sm font-medium">Selected node</p>
-              <div className="mt-2 rounded-lg bg-secondary/18 p-4">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="font-semibold">{selected.label}</p>
-                  <Badge variant="outline">{selected.type}</Badge>
-                </div>
-                <p className="mt-2 text-sm leading-7 text-muted-foreground">
-                  Click nodes to inspect them while the highlighted path stays visible.
-                </p>
-              </div>
-            </div>
-          </aside>
+          </div>
+
+          <div className="grid content-start gap-5">
+            <RoutingControlPanel
+              destinationId={destinationId}
+              links={links}
+              nodes={initialRoutingNodes}
+              routePath={route.path}
+              selected={selected}
+              sourceId={sourceId}
+              onChangeCost={updateLinkCost}
+              onResetTopology={resetTopology}
+              onSelectDestination={updateDestination}
+              onSelectLink={(linkId) => setSelected({ type: "link", id: linkId })}
+              onSelectSource={updateSource}
+              onToggleLink={toggleLink}
+            />
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+          <RoutingWorkflowPanel activeStep={workflowStep} />
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+            <RoutingScenarioPresets onApplyScenario={applyScenario} />
+            <RoutingChallengePanel
+              destinationId={destinationId}
+              route={route}
+              sourceId={sourceId}
+            />
+          </div>
         </div>
       </ToolWorkspace>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_0.75fr]">
-        <ExplanationPanel title="Route decision">
-          <p>
-            The packet follows the lowest-cost known path. In this topology, that means{" "}
-            <span className="font-mono text-foreground">{shortest.path.join(" → ")}</span>.
-          </p>
-          <p>
-            Real routers make similar decisions using routing tables built by static routes or
-            dynamic routing protocols.
-          </p>
-        </ExplanationPanel>
-        <PracticePrompt prompt="Find the link costs along the highlighted path. Add them together and confirm the total route cost." />
-      </div>
+      <PracticePrompt prompt="Disable the cheapest link on the route. Which backup path does the packet take next?" />
     </div>
   );
 }
 
-function RoutingCanvas({
-  packetKey,
-  packetLeft,
-  packetTop,
-  pathPositions,
-  selectedNode,
-  setSelectedNode,
-  shortestPath,
-  staticOnOpen = false,
-  large = false
-}: {
-  packetKey: number;
-  packetLeft: string[];
-  packetTop: string[];
-  pathPositions: Array<{ left: string; top: string }>;
-  selectedNode: string;
-  setSelectedNode: (nodeId: string) => void;
-  shortestPath: string[];
-  staticOnOpen?: boolean;
-  large?: boolean;
-}) {
-  const packetTarget = pathPositions.at(-1) ?? pathPositions[0];
+function nodeById(id: string) {
+  return initialRoutingNodes.find((node) => node.id === id) ?? initialRoutingNodes[0];
+}
 
-  return (
-    <div
-      className={`relative overflow-hidden rounded-xl bg-secondary/15 ${large ? "min-h-[500px]" : "min-h-[420px]"}`}
-    >
-      <div className="network-grid absolute inset-0 opacity-10" />
-      <svg className="absolute inset-0 h-full w-full" aria-hidden="true">
-        {routingEdges.map((edge) => {
-          const from = routingNodes.find((node) => node.id === edge.from)!;
-          const to = routingNodes.find((node) => node.id === edge.to)!;
-          const active = isPathEdge(shortestPath, edge.from, edge.to);
+function linkLabel(link: Pick<RoutingLabLink, "from" | "to">) {
+  return `${nodeById(link.from).label}-${nodeById(link.to).label}`;
+}
 
-          return (
-            <g key={`${edge.from}-${edge.to}`}>
-              <line
-                x1={`${from.x}%`}
-                y1={`${from.y}%`}
-                x2={`${to.x}%`}
-                y2={`${to.y}%`}
-                stroke={active ? "var(--primary)" : "var(--border)"}
-                strokeWidth={active ? 3 : 1}
-                strokeOpacity={active ? 0.7 : 0.4}
-              />
-              <text
-                x={`${(from.x + to.x) / 2}%`}
-                y={`${(from.y + to.y) / 2}%`}
-                fill="currentColor"
-                className="text-xs text-muted-foreground"
-              >
-                {edge.cost}
-              </text>
-            </g>
-          );
-        })}
-      </svg>
-      {routingNodes.map((node) => {
-        const inPath = shortestPath.includes(node.id);
-        return (
-          <button
-            key={node.id}
-            className={`absolute grid size-18 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-xl text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-              selectedNode === node.id
-                ? "bg-accent/12 text-accent ring-1 ring-accent/30"
-                : inPath
-                  ? "bg-primary/12 text-primary ring-1 ring-primary/22"
-                  : "bg-card/80 text-foreground ring-1 ring-border/35"
-            }`}
-            style={{ left: `${node.x}%`, top: `${node.y}%` }}
-            onClick={() => setSelectedNode(node.id)}
-          >
-            {node.label}
-          </button>
-        );
-      })}
-      <motion.div
-        key={packetKey}
-        className="absolute size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/80"
-        initial={staticOnOpen ? packetTarget : pathPositions[0]}
-        animate={staticOnOpen ? packetTarget : { left: packetLeft, top: packetTop }}
-        transition={{ duration: staticOnOpen ? 0 : 3.2, ease: "easeInOut" }}
-      />
-    </div>
-  );
+function scenarioLinks(scenario: RoutingScenarioId) {
+  const links = initialRoutingLinks.map((link) => ({ ...link }));
+
+  if (scenario === "expensive-r1") {
+    return links.map((link) =>
+      ["client-r1", "r1-r3"].includes(link.id) ? { ...link, cost: link.cost + 6 } : link
+    );
+  }
+
+  if (scenario === "link-failure") {
+    return links.map((link) => (link.id === "r3-server" ? { ...link, disabled: true } : link));
+  }
+
+  if (scenario === "no-route") {
+    return links.map((link) =>
+      ["client-r1", "client-r2"].includes(link.id) ? { ...link, disabled: true } : link
+    );
+  }
+
+  return links;
+}
+
+function scenarioLabel(scenario: RoutingScenarioId) {
+  const labels: Record<RoutingScenarioId, string> = {
+    normal: "Normal network restored",
+    "expensive-r1": "R1 path made expensive",
+    "link-failure": "R3 to Server link disabled",
+    "no-route": "Client uplinks disabled"
+  };
+
+  return labels[scenario];
 }
